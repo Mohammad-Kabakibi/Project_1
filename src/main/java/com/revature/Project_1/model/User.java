@@ -3,11 +3,12 @@ package com.revature.Project_1.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "users")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int userId;
 
     private String firstName;
     private String lastName;
@@ -19,7 +20,7 @@ public class User {
     private String password;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "roleId")
     private Role role;
 
 
@@ -30,7 +31,7 @@ public class User {
     }
 
     public User(int id, String firstName, String lastName, String username, String password, Role role) {
-        this.id = id;
+        this.userId = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -38,12 +39,12 @@ public class User {
         this.role = role;
     }
 
-    public int getId() {
-        return id;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setUserId(int id) {
+        this.userId = id;
     }
 
     public String getFirstName() {

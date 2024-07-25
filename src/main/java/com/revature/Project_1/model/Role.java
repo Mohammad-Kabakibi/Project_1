@@ -7,7 +7,7 @@ import jakarta.persistence.Id;
 @Entity
 public class Role {
     @Id
-    private int id;
+    private int roleId;
 
     @Column(unique = true, nullable = false)
     private String name;
@@ -17,7 +17,7 @@ public class Role {
 
 
     public Role(int id, String name) {
-        this.id = id;
+        this.roleId = id;
         this.name = name;
     }
 
@@ -25,12 +25,12 @@ public class Role {
 
     }
 
-    public int getId() {
-        return id;
+    public int getRoleId() {
+        return roleId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setRoleId(int id) {
+        this.roleId = id;
     }
 
     public String getName() {
