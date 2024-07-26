@@ -1,5 +1,6 @@
 package com.revature.Project_1.controller;
 
+import com.revature.Project_1.model.DTO.IncomingReimbDTO;
 import com.revature.Project_1.model.Reimbursement;
 import com.revature.Project_1.service.ReimbursementService;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +20,8 @@ public class ReimbursementController {
     }
 
     @PostMapping(consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Reimbursement> createReimbursement(@RequestBody Reimbursement newReimb){
-        Reimbursement reimb = reimbursementService.createReimbursement(newReimb);
+    public ResponseEntity<Reimbursement> createReimbursement(@RequestBody IncomingReimbDTO reimbDTO){
+        Reimbursement reimb = reimbursementService.createReimbursement(reimbDTO);
 
         return ResponseEntity.status(201).body(reimb);
     }

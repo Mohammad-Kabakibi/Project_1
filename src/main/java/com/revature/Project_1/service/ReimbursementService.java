@@ -1,8 +1,11 @@
 package com.revature.Project_1.service;
 
 import com.revature.Project_1.DAO.ReimbursementDAO;
+import com.revature.Project_1.DAO.UserDAO;
+import com.revature.Project_1.model.DTO.IncomingReimbDTO;
 import com.revature.Project_1.model.Reimbursement;
 
+import com.revature.Project_1.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -16,18 +19,26 @@ public class ReimbursementService {
 
 
     private ReimbursementDAO reimbursementDAO;
+    private UserDAO userDAO;
 
-    @Autowired
-    public ReimbursementService(ReimbursementDAO reimbursementDAO) {
+    public ReimbursementService(ReimbursementDAO reimbursementDAO, UserDAO userDAO) {
         this.reimbursementDAO = reimbursementDAO;
+        this.userDAO = userDAO;
     }
 
-    public Reimbursement createReimbursement(Reimbursement reimb){
+    public Reimbursement createReimbursement(IncomingReimbDTO reimbDTO){
 
         //TODO: BUSINESS LOGIC: GET user_id from current session
+        Reimbursement reimb = new Reimbursement();
 
-        //Set status to Pending
+        reimb.setDescription(reimbDTO.getDescriptioon());
+        reimb.setAmount(reimbDTO.getAmount());
+        //Set status to Pending as default
         reimb.setStatus("Pending");
+
+        User user = userDAO.findById(reimbDTO.getUserId()).get();
+
+        reimb.setUser(user);
 
         Reimbursement createdReimb = reimbursementDAO.save(reimb);
 
