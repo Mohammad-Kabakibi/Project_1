@@ -12,7 +12,6 @@ import java.util.List;
 
 @Service
 public class ReimbursementService {
-    private ReimbursementDAO reimbDAO;
 
 
     private ReimbursementDAO reimbursementDAO;
@@ -29,7 +28,7 @@ public class ReimbursementService {
         //Set status to Pending
         reimb.setStatus("Pending");
 
-        Reimbursement createdReimb = reimbDAO.save(reimb);
+        Reimbursement createdReimb = reimbursementDAO.save(reimb);
 
         return createdReimb;
     }

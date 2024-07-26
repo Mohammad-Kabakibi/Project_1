@@ -18,6 +18,13 @@ public class ReimbursementController {
         this.reimbursementService = reimbursementService;
     }
 
+    @PostMapping
+    public ResponseEntity<Reimbursement> createReimbursement(@RequestBody Reimbursement newReimb){
+        Reimbursement reimb = reimbursementService.createReimbursement(newReimb);
+
+        return ResponseEntity.status(201).body(reimb);
+    }
+
     @GetMapping
     public ResponseEntity<List<Reimbursement>> getAllReimbursements(){
         var reimbursements = reimbursementService.getAllReimbursements();
