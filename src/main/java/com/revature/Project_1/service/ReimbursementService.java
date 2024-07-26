@@ -6,10 +6,7 @@ import com.revature.Project_1.model.DTO.IncomingReimbDTO;
 import com.revature.Project_1.model.Reimbursement;
 
 import com.revature.Project_1.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,22 +25,33 @@ public class ReimbursementService {
 
     public Reimbursement createReimbursement(IncomingReimbDTO reimbDTO){
 
-        //TODO: BUSINESS LOGIC: GET user_id from current session
         Reimbursement reimb = new Reimbursement();
 
-        reimb.setDescription(reimbDTO.getDescriptioon());
+        reimb.setDescription(reimbDTO.getDescription());
         reimb.setAmount(reimbDTO.getAmount());
-        //Set status to Pending as default
-        reimb.setStatus("Pending");
+        //Set status to pending as default
+        reimb.setStatus("pending");
 
+        //TODO: BUSINESS LOGIC: GET user_id from current session
         User user = userDAO.findById(reimbDTO.getUserId()).get();
-
         reimb.setUser(user);
 
         Reimbursement createdReimb = reimbursementDAO.save(reimb);
 
         return createdReimb;
     }
+
+    public List<Reimbursement> getLoggedInUserReimbursements() {
+        int userId = 1;
+        return reimbursementDAO.findByUser_userId(userId);
+    }
+
+    public List<Reimbursement> getLoggedInUserPendingReimbursements() {
+        int userId = 1;
+        return reimbursementDAO.findByStatusAndUser_userId("pending",userId);
+    }
+
+
 
     public List<Reimbursement> getAllReimbursements() {
 //        return reimbursementDAO.findAll(Sort.by("reimbId"));

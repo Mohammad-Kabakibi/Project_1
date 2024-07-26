@@ -3,7 +3,7 @@ package com.revature.Project_1.model.DTO;
 
 //NOTE: This class is temporarily, will be removed when we implement sessions
 public class IncomingReimbDTO {
-    private String descriptioon;
+    private String description;
     private float amount;
     private int userId;
 
@@ -11,17 +11,17 @@ public class IncomingReimbDTO {
     }
 
     public IncomingReimbDTO(String descriptioon, float amount, int userId) {
-        this.descriptioon = descriptioon;
+        this.description = descriptioon;
         this.amount = amount;
         this.userId = userId;
     }
 
-    public String getDescriptioon() {
-        return descriptioon;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDescriptioon(String descriptioon) {
-        this.descriptioon = descriptioon;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public float getAmount() {

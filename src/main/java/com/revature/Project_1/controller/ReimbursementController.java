@@ -19,7 +19,7 @@ public class ReimbursementController {
         this.reimbursementService = reimbursementService;
     }
 
-    @PostMapping(consumes = "application/json", produces = "application/json")
+    @PostMapping
     public ResponseEntity<Reimbursement> createReimbursement(@RequestBody IncomingReimbDTO reimbDTO){
         Reimbursement reimb = reimbursementService.createReimbursement(reimbDTO);
 
@@ -29,6 +29,18 @@ public class ReimbursementController {
     @GetMapping
     public ResponseEntity<List<Reimbursement>> getAllReimbursements(){
         var reimbursements = reimbursementService.getAllReimbursements();
+        return ResponseEntity.ok(reimbursements);
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<List<Reimbursement>> getLoggedInUserReimbursements(){
+        var reimbursements = reimbursementService.getLoggedInUserReimbursements();
+        return ResponseEntity.ok(reimbursements);
+    }
+
+    @GetMapping("/profile/pending")
+    public ResponseEntity<List<Reimbursement>> getLoggedInUserPendingReimbursements(){
+        var reimbursements = reimbursementService.getLoggedInUserPendingReimbursements();
         return ResponseEntity.ok(reimbursements);
     }
 

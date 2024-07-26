@@ -11,4 +11,6 @@ public interface ReimbursementDAO extends JpaRepository<Reimbursement,Integer> {
     List<Reimbursement> findByStatus(String status);
 
     List<Reimbursement> findByUser_userId(int userId); // when we use [_] the name after it is the property name
+
+    List<Reimbursement> findByStatusAndUser_userId(String status, int userId);
 }
