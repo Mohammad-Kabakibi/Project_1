@@ -18,7 +18,8 @@ public class Reimbursement {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "userId")
-    @JsonManagedReference
+    //@JsonManagedReference I'll disable this for now
+    // because it causes an error when I create new reimbursement
     private User user;
 
 

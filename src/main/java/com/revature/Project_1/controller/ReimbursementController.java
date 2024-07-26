@@ -18,7 +18,7 @@ public class ReimbursementController {
         this.reimbursementService = reimbursementService;
     }
 
-    @PostMapping
+    @PostMapping(consumes = "application/json", produces = "application/json")
     public ResponseEntity<Reimbursement> createReimbursement(@RequestBody Reimbursement newReimb){
         Reimbursement reimb = reimbursementService.createReimbursement(newReimb);
 
