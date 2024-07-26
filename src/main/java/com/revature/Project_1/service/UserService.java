@@ -1,6 +1,7 @@
 package com.revature.Project_1.service;
 
 import com.revature.Project_1.DAO.UserDAO;
+import com.revature.Project_1.exception.UsernameAlreadyExistsException;
 import com.revature.Project_1.model.Role;
 import com.revature.Project_1.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +26,12 @@ public class UserService {
         return userDAO.findAll();
     }
 
-    public User createUser(User user){
+    public User createUser(User user) throws UsernameAlreadyExistsException{
 
-        //TODO: Business Logic: check username already exists
-
+        //Check if the username already exists
+        if(userDAO.findByUsername(user.getUsername()).isPresent()){
+            throw new UsernameAlreadyExistsException(user.getUsername());
+        }
 
         //By default, assigning the Employee Role
         Role employeeRole = roleService.getEmployeeRole();

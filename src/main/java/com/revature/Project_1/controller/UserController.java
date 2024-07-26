@@ -1,9 +1,11 @@
 package com.revature.Project_1.controller;
 
+import com.revature.Project_1.exception.UsernameAlreadyExistsException;
 import com.revature.Project_1.model.User;
 import com.revature.Project_1.service.ReimbursementService;
 import com.revature.Project_1.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +32,12 @@ public class UserController {
         User user = userService.createUser(newUser);
 
         return ResponseEntity.status(201).body(user);
+    }
+
+    //Exception handler for duplicate username
+    @ExceptionHandler(UsernameAlreadyExistsException.class)
+    public ResponseEntity<String> handleUsernameAlreadyExistsException( UsernameAlreadyExistsException e){
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
     @GetMapping
