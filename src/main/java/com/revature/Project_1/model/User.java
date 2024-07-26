@@ -1,5 +1,6 @@
 package com.revature.Project_1.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -25,7 +26,8 @@ public class User {
     @JoinColumn(name = "roleId")
     private Role role;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<Reimbursement> reimbursements;
 
 

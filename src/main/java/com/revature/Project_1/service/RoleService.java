@@ -22,4 +22,11 @@ public class RoleService {
     public Role getManagerRole(){
         return roleDAO.findByName("Manager");
     }
+
+//    public Role getRoleById(int roleId) {
+//        var role = roleDAO.findById(roleId);
+//        if(role.isPresent())
+//            return role.get();
+//        return null;
+//    }
 }
