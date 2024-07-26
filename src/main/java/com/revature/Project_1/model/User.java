@@ -2,6 +2,8 @@ package com.revature.Project_1.model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -23,6 +25,9 @@ public class User {
     @JoinColumn(name = "roleId")
     private Role role;
 
+    @OneToMany(mappedBy = "user")
+    private List<Reimbursement> reimbursements;
+
 
     //boilerplate code
 
@@ -37,6 +42,10 @@ public class User {
         this.username = username;
         this.password = password;
         this.role = role;
+    }
+
+    public List<Reimbursement> getReimbursements() {
+        return reimbursements;
     }
 
     public int getUserId() {
