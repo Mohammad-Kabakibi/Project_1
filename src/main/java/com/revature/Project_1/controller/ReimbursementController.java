@@ -4,6 +4,9 @@ import com.revature.Project_1.model.DTO.IncomingReimbDTO;
 import com.revature.Project_1.model.Reimbursement;
 import com.revature.Project_1.service.ReimbursementService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -11,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/reimbursements")
+//@EnableMethodSecurity(securedEnabled = true)
 public class ReimbursementController {
 
     private ReimbursementService reimbursementService;
@@ -27,7 +31,10 @@ public class ReimbursementController {
     }
 
     @GetMapping
+//    @Secured("ROLE_Manager")
     public ResponseEntity<List<Reimbursement>> getAllReimbursements(){
+//        to get the user info from the token:
+//        System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         var reimbursements = reimbursementService.getAllReimbursements();
         return ResponseEntity.ok(reimbursements);
     }

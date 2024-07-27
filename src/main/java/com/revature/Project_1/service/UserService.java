@@ -1,6 +1,7 @@
 package com.revature.Project_1.service;
 
 import com.revature.Project_1.DAO.UserDAO;
+import com.revature.Project_1.JWT.JwtSecurityConfiguration;
 import com.revature.Project_1.exception.UsernameAlreadyExistsException;
 import com.revature.Project_1.model.Role;
 import com.revature.Project_1.model.User;
@@ -36,6 +37,9 @@ public class UserService {
         //By default, assigning the Employee Role
         Role employeeRole = roleService.getEmployeeRole();
         user.setRole(employeeRole);
+
+//        String password = user.getPassword();
+//        user.setPassword(JwtSecurityConfiguration.passwordEncoder().encode(password));
 
         User createdUser = userDAO.save(user);
 
