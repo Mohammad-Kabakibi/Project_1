@@ -2,6 +2,8 @@ package com.revature.Project_1.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
@@ -13,13 +15,22 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userId;
 
+    @Size(min = 3, message = "first name should contain at least 3 characters")
+    @NotNull(message = "first name is required")
     private String firstName;
+
+    @Size(min = 3, message = "last name should contain at least 3 characters")
+    @NotNull(message = "last name is required")
     private String lastName;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
+    @Size(min = 3, message = "username should contain at least 3 characters")
+    @NotNull(message = "username is required")
     private String username;
 
     @Column(nullable = false)
+    @Size(min = 5, message = "password should contain at least 5 characters")
+    @NotNull(message = "password is required")
     private String password;
 
     @ManyToOne(fetch = FetchType.EAGER)

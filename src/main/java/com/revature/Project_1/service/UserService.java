@@ -2,12 +2,10 @@ package com.revature.Project_1.service;
 
 import com.revature.Project_1.DAO.UserDAO;
 import com.revature.Project_1.JWT.JwtSecurityConfiguration;
-import com.revature.Project_1.exception.CustomException;
-import com.revature.Project_1.exception.InvalidIDException;
-import com.revature.Project_1.exception.UserNotFoundException;
-import com.revature.Project_1.exception.UsernameAlreadyExistsException;
+import com.revature.Project_1.exception.*;
 import com.revature.Project_1.model.Role;
 import com.revature.Project_1.model.User;
+import jakarta.validation.Validation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -85,6 +83,20 @@ public class UserService {
 //                Role role = roleService.getRoleById(role_id);
             Role role = roleService.getManagerRole();
             user.setRole(role);
+        }
+
+        try(var validator = Validation.buildDefaultValidatorFactory()){
+            var errs = validator.getValidator().validate(user);
+            if(!errs.isEmpty()){
+                var exception = new InvalidUserException();
+                errs.forEach(err -> exception.addMessage(err.getPropertyPath().toString(),err.getMessage()));
+                throw exception;
+            }
+            // checking if username already exists
+            var u = userDAO.findByUsername(user.getUsername());
+            if(u.isPresent())
+                if(u.get().getUserId() != user.getUserId())
+                    throw new UsernameAlreadyExistsException(user.getUsername());
         }
         return userDAO.save(user);
     }

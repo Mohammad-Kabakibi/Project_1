@@ -1,7 +1,12 @@
 package com.revature.Project_1.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Reimbursement {
@@ -10,15 +15,20 @@ public class Reimbursement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int reimbId;
 
+    @Size(min = 3, message = "description should contain at least 3 characters")
+    @NotNull(message = "description is required")
     private String description;
 
+    @NotNull(message = "amount is required")
+    @Positive(message = "amount should be a positive number")
     private float amount;
 
+    @NotEmpty(message = "status cannot be empty")
     private String status;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "userId")
-    @JsonManagedReference
+//    @JsonManagedReference
     private User user;
 
 

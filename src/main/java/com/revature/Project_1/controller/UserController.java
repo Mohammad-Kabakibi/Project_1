@@ -5,8 +5,10 @@ import com.revature.Project_1.exception.InvalidIDException;
 import com.revature.Project_1.model.User;
 import com.revature.Project_1.service.ReimbursementService;
 import com.revature.Project_1.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -27,7 +29,7 @@ public class UserController {
 
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User newUser){
+    public ResponseEntity<User> createUser(@RequestBody @Valid User newUser) throws CustomException{
 
         User user = userService.createUser(newUser);
 

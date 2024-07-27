@@ -1,12 +1,14 @@
 package com.revature.Project_1.controller;
 
-import com.revature.Project_1.model.DTO.IncomingReimbDTO;
+import com.revature.Project_1.exception.CustomException;
+import com.revature.Project_1.exception.InvalidIDException;
 import com.revature.Project_1.model.Reimbursement;
 import com.revature.Project_1.service.ReimbursementService;
+import jakarta.validation.Valid;
+import jakarta.validation.Validator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -24,9 +26,8 @@ public class ReimbursementController {
     }
 
     @PostMapping
-    public ResponseEntity<Reimbursement> createReimbursement(@RequestBody IncomingReimbDTO reimbDTO){
-        Reimbursement reimb = reimbursementService.createReimbursement(reimbDTO);
-
+    public ResponseEntity<Reimbursement> createReimbursement(@RequestBody @Valid Reimbursement reimbursement){
+        Reimbursement reimb = reimbursementService.createReimbursement(reimbursement);
         return ResponseEntity.status(201).body(reimb);
     }
 
@@ -34,7 +35,7 @@ public class ReimbursementController {
 //    @Secured("ROLE_Manager")
     public ResponseEntity<List<Reimbursement>> getAllReimbursements(){
 //        to get the user info from the token:
-//        System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+//        System.out.println(SecurityContextHolder.getContext().getAuthentication());
         var reimbursements = reimbursementService.getAllReimbursements();
         return ResponseEntity.ok(reimbursements);
     }
@@ -58,14 +59,24 @@ public class ReimbursementController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Object> updateReimbursement(@PathVariable String id, @RequestBody HashMap<String,Object> newReimbursement){
+    public ResponseEntity<Object> updateReimbursement(@PathVariable String id, @RequestBody HashMap<String,Object> newReimbursement) throws CustomException {
         try{
             int reimbursement_id = Integer.parseInt(id);
             var reimbursement = reimbursementService.updateReimbursementById(reimbursement_id, newReimbursement);
             return ResponseEntity.ok(reimbursement);
-        }catch (Exception ex){ // later we'll catch custom exceptions...
-            return ResponseEntity.badRequest().body("ID must be an integer number.");
+        }catch (NumberFormatException ex){
+            throw new InvalidIDException();
         }
+    }
+
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<Object> handleCustomException( CustomException e){
+        return ResponseEntity.status(e.getStatus()).body(e.getMsg());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleException( Exception e){
+        return ResponseEntity.status(400).body(e.getMessage());
     }
 
 }

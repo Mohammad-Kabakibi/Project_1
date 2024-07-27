@@ -12,7 +12,7 @@ public class CustomException extends Exception{
     }
 
 
-    public CustomMessage getMsg() {
+    public Object getMsg() {
         return new CustomMessage(super.getMessage());
     }
 
