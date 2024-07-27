@@ -7,6 +7,7 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,8 +34,8 @@ public class JwtSecurityConfiguration{
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(
                 auth -> {
-//                    auth.requestMatchers("/authenticate").permitAll().anyRequest().authenticated();
-                    auth.anyRequest().permitAll(); // to avoid login for now
+                    auth.requestMatchers(HttpMethod.POST,"/authenticate","/user").permitAll().anyRequest().authenticated();
+//                    auth.anyRequest().permitAll(); // to avoid login for now
                 });
 
         http.sessionManagement(

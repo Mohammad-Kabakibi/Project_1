@@ -7,9 +7,7 @@ import com.revature.Project_1.model.DTO.IncomingReimbDTO;
 import com.revature.Project_1.model.Reimbursement;
 
 import com.revature.Project_1.model.User;
-import jakarta.validation.Valid;
 import jakarta.validation.Validation;
-import jakarta.validation.Validator;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +26,7 @@ public class ReimbursementService {
         this.userDAO = userDAO;
     }
 
-    public Reimbursement createReimbursement(Reimbursement reimbursement){
+    public Reimbursement createReimbursement(IncomingReimbDTO reimbursement) throws CustomException {
 
         Reimbursement reimb = new Reimbursement();
 
@@ -41,6 +39,15 @@ public class ReimbursementService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userDAO.findByUsername(username).get();
         reimb.setUser(user);
+
+        try(var validator = Validation.buildDefaultValidatorFactory()){
+            var errs = validator.getValidator().validate(reimb);
+            if(!errs.isEmpty()){
+                var exception = new InvalidReimbursementException();
+                errs.forEach(err -> exception.addMessage(err.getPropertyPath().toString(),err.getMessage()));
+                throw exception;
+            }
+        }
 
         Reimbursement createdReimb = reimbursementDAO.save(reimb);
 
@@ -75,18 +82,21 @@ public class ReimbursementService {
         return reimbursementDAO.findByUser_userId(userId);
     }
 
-    public Reimbursement updateReimbursementById(int reimbursementId, HashMap<String, Object> newReimbursement) throws CustomException {
+    public Reimbursement updateReimbursementById(int reimbursementId, HashMap<String, Object> newReimbursement, boolean isManager) throws CustomException {
         var reimbursement_optional = reimbursementDAO.findById(reimbursementId);
         if(reimbursement_optional.isEmpty())
             throw new ReimbursementNotFoundException(reimbursementId);
 
         Reimbursement reimbursement = reimbursement_optional.get();
 
+        if(!isManager && !reimbursement.getStatus().equals("pending"))
+            throw new ForbiddenActionException("you cannot update non-pending reimbursements");
+
         if(newReimbursement.containsKey("description"))
             reimbursement.setDescription((String) newReimbursement.get("description"));
-        if(newReimbursement.containsKey("amount"))
-            reimbursement.setAmount(Float.parseFloat(newReimbursement.get("amount").toString()));
-        if(newReimbursement.containsKey("status"))
+//        if(isManager && newReimbursement.containsKey("amount"))
+//            reimbursement.setAmount(Float.parseFloat(newReimbursement.get("amount").toString()));
+        if(isManager && newReimbursement.containsKey("status"))
             reimbursement.setStatus((String) newReimbursement.get("status"));
 
         try(var validator = Validation.buildDefaultValidatorFactory()){

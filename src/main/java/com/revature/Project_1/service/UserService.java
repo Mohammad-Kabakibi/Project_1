@@ -39,8 +39,8 @@ public class UserService {
         Role employeeRole = roleService.getEmployeeRole();
         user.setRole(employeeRole);
 
-//        String password = user.getPassword();
-//        user.setPassword(JwtSecurityConfiguration.passwordEncoder().encode(password));
+        String password = user.getPassword();
+        user.setPassword(JwtSecurityConfiguration.passwordEncoder().encode(password));
 
         User createdUser = userDAO.save(user);
 

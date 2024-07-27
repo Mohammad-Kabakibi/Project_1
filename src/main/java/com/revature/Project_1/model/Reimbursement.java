@@ -1,7 +1,5 @@
 package com.revature.Project_1.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -26,7 +24,7 @@ public class Reimbursement {
     @NotEmpty(message = "status cannot be empty")
     private String status;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "userId")
 //    @JsonManagedReference
     private User user;

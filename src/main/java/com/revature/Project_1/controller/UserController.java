@@ -8,7 +8,8 @@ import com.revature.Project_1.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/user")
+@EnableMethodSecurity(securedEnabled = true)
 public class UserController {
 
     private UserService userService;
@@ -48,12 +50,14 @@ public class UserController {
     }
 
     @GetMapping
+    @Secured("ROLE_Manager")
     public ResponseEntity<List<User>> getAllUsers(){
         var users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
     @DeleteMapping("/{id}")
+    @Secured("ROLE_Manager")
     public ResponseEntity<Object> deleteUser(@PathVariable String id) throws CustomException {
         try {
             int user_id = Integer.parseInt(id);
@@ -67,6 +71,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
+    @Secured("ROLE_Manager")
     public ResponseEntity<Object> updateUser(@PathVariable String id, @RequestBody HashMap<String,Object> newUser) throws CustomException {
         try{
             int user_id = Integer.parseInt(id);
@@ -78,6 +83,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/reimbursements")
+    @Secured("ROLE_Manager")
     public ResponseEntity<Object> getReimbursementsByUserId(@PathVariable String id) throws CustomException {
         try{
             int user_id = Integer.parseInt(id);
@@ -87,4 +93,5 @@ public class UserController {
             throw new InvalidIDException();
         }
     }
+
 }
