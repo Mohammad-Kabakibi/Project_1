@@ -2,6 +2,9 @@ package com.revature.Project_1.service;
 
 import com.revature.Project_1.DAO.ReimbursementDAO;
 import com.revature.Project_1.DAO.UserDAO;
+import com.revature.Project_1.exception.CustomException;
+import com.revature.Project_1.exception.InvalidIDException;
+import com.revature.Project_1.exception.UserNotFoundException;
 import com.revature.Project_1.model.DTO.IncomingReimbDTO;
 import com.revature.Project_1.model.Reimbursement;
 
@@ -62,7 +65,11 @@ public class ReimbursementService {
         return reimbursementDAO.findByStatus("pending");
     }
 
-    public List<Reimbursement> getReimbursementsByUserId(int userId) {
+    public List<Reimbursement> getReimbursementsByUserId(int userId) throws CustomException {
+        if(userId <= 0)
+            throw new InvalidIDException();
+        if(userDAO.findById(userId).isEmpty())
+            throw new UserNotFoundException(userId);
         return reimbursementDAO.findByUser_userId(userId);
     }
 

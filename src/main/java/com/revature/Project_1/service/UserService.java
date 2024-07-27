@@ -2,6 +2,9 @@ package com.revature.Project_1.service;
 
 import com.revature.Project_1.DAO.UserDAO;
 import com.revature.Project_1.JWT.JwtSecurityConfiguration;
+import com.revature.Project_1.exception.CustomException;
+import com.revature.Project_1.exception.InvalidIDException;
+import com.revature.Project_1.exception.UserNotFoundException;
 import com.revature.Project_1.exception.UsernameAlreadyExistsException;
 import com.revature.Project_1.model.Role;
 import com.revature.Project_1.model.User;
@@ -47,39 +50,42 @@ public class UserService {
     }
 
 
-    public User deleteUserById(int userId) {
+    public User deleteUserById(int userId) throws CustomException {
+        if(userId <= 0)
+            throw new InvalidIDException();
         var user = userDAO.findById(userId);
-        if(user.isPresent()) {
-            userDAO.deleteById(userId);
-            return user.get();
-        }
-        else
-            return null; // later we'll throw a custom exception(user not found)...
+        if(user.isEmpty())
+            throw new UserNotFoundException(userId);
+
+        userDAO.deleteById(userId);
+        return user.get();
     }
 
-    public User updateUserById(int userId, HashMap<String,Object> newUser) {
+    public User updateUserById(int userId, HashMap<String,Object> newUser) throws CustomException {
+        if(userId <= 0)
+            throw new InvalidIDException();
         var user_optional = userDAO.findById(userId);
-        if(user_optional.isPresent()) {
-            User user = user_optional.get();
+        if(user_optional.isEmpty())
+            throw new UserNotFoundException(userId);
 
-            if(newUser.containsKey("firstName"))
-                user.setFirstName((String) newUser.get("firstName"));
-            if(newUser.containsKey("lastName"))
-                user.setLastName((String) newUser.get("lastName"));
-            if(newUser.containsKey("username"))
-                user.setUsername((String) newUser.get("username"));
-            if(newUser.containsKey("password"))
-                user.setPassword((String) newUser.get("password"));
-            if(newUser.containsKey("role")){
+        User user = user_optional.get();
+
+        if(newUser.containsKey("firstName"))
+            user.setFirstName((String) newUser.get("firstName"));
+        if(newUser.containsKey("lastName"))
+            user.setLastName((String) newUser.get("lastName"));
+        if(newUser.containsKey("username"))
+            user.setUsername((String) newUser.get("username"));
+        if(newUser.containsKey("password")) {
+            String password = (String) newUser.get("password");
+            user.setPassword(JwtSecurityConfiguration.passwordEncoder().encode(password));
+        }
+        if(newUser.containsKey("role")){
 //                int role_id = Integer.parseInt((String)newUser.get("role"));
 //                Role role = roleService.getRoleById(role_id);
-                Role role = roleService.getManagerRole();
-                user.setRole(role);
-            }
-
-            return userDAO.save(user);
+            Role role = roleService.getManagerRole();
+            user.setRole(role);
         }
-        else
-            return null; // later we'll throw a custom exception(user not found)...
+        return userDAO.save(user);
     }
 }

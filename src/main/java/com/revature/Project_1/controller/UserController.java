@@ -1,11 +1,11 @@
 package com.revature.Project_1.controller;
 
-import com.revature.Project_1.exception.UsernameAlreadyExistsException;
+import com.revature.Project_1.exception.CustomException;
+import com.revature.Project_1.exception.InvalidIDException;
 import com.revature.Project_1.model.User;
 import com.revature.Project_1.service.ReimbursementService;
 import com.revature.Project_1.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,9 +35,14 @@ public class UserController {
     }
 
     //Exception handler for duplicate username
-    @ExceptionHandler(UsernameAlreadyExistsException.class)
-    public ResponseEntity<String> handleUsernameAlreadyExistsException( UsernameAlreadyExistsException e){
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+//    @ExceptionHandler(UsernameAlreadyExistsException.class)
+//    public ResponseEntity<String> handleUsernameAlreadyExistsException( UsernameAlreadyExistsException e){
+//        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+//    }
+
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<Object> handleCustomException( CustomException e){
+        return ResponseEntity.status(e.getStatus()).body(e.getMsg());
     }
 
     @GetMapping
@@ -47,36 +52,37 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteUser(@PathVariable String id){
-        try{
+    public ResponseEntity<Object> deleteUser(@PathVariable String id) throws CustomException {
+        try {
             int user_id = Integer.parseInt(id);
             var user = userService.deleteUserById(user_id);
             return ResponseEntity.ok(user);
-        }catch (Exception ex){ // later we'll catch custom exceptions...
-            return ResponseEntity.badRequest().body("ID must be an integer number.");
+        }
+        catch (NumberFormatException ex){ // if the parsing failed
+//            return ResponseEntity.badRequest().body("ID must be an integer number.");
+            throw new InvalidIDException();
         }
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Object> updateUser(@PathVariable String id, @RequestBody HashMap<String,Object> newUser){
+    public ResponseEntity<Object> updateUser(@PathVariable String id, @RequestBody HashMap<String,Object> newUser) throws CustomException {
         try{
             int user_id = Integer.parseInt(id);
             var user = userService.updateUserById(user_id, newUser);
             return ResponseEntity.ok(user);
-        }catch (Exception ex){ // later we'll catch custom exceptions...
-            return ResponseEntity.badRequest().body("ID must be an integer number.");
+        }catch (NumberFormatException ex){
+            throw new InvalidIDException();
         }
     }
 
     @GetMapping("/{id}/reimbursements")
-    public ResponseEntity<Object> getReimbursementsByUserId(@PathVariable String id){
+    public ResponseEntity<Object> getReimbursementsByUserId(@PathVariable String id) throws CustomException {
         try{
             int user_id = Integer.parseInt(id);
-            // todo: check if user exists...
             var reimbursements = reimbursementService.getReimbursementsByUserId(user_id);
             return ResponseEntity.ok(reimbursements);
-        }catch (Exception ex){ // later we'll catch custom exceptions...
-            return ResponseEntity.badRequest().body("ID must be an integer number.");
+        }catch (NumberFormatException ex){
+            throw new InvalidIDException();
         }
     }
 }

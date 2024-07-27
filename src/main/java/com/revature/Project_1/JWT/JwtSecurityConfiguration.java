@@ -26,14 +26,15 @@ import java.util.UUID;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 
-//@Configuration
+@Configuration
 public class JwtSecurityConfiguration{
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(
                 auth -> {
-                    auth.requestMatchers("/authenticate").permitAll().anyRequest().authenticated();
+//                    auth.requestMatchers("/authenticate").permitAll().anyRequest().authenticated();
+                    auth.anyRequest().permitAll(); // to avoid login for now
                 });
 
         http.sessionManagement(
