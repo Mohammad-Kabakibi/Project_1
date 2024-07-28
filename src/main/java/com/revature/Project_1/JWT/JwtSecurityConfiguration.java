@@ -17,6 +17,8 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.security.KeyPair;
@@ -44,7 +46,7 @@ public class JwtSecurityConfiguration{
                                 SessionCreationPolicy.STATELESS)
         );
 
-        http.httpBasic(withDefaults());
+        http.httpBasic(withDefaults()); // basic auth
 
         http.csrf(csrf -> csrf.disable());
 
@@ -54,6 +56,7 @@ public class JwtSecurityConfiguration{
 
         return http.build();
     }
+
 
     @Bean
     public static BCryptPasswordEncoder passwordEncoder() {
@@ -110,5 +113,16 @@ public class JwtSecurityConfiguration{
                 .passwordEncoder(bCryptPasswordEncoder)
                 .and()
                 .build();
+    }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+
+        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        grantedAuthoritiesConverter.setAuthorityPrefix("");
+
+        JwtAuthenticationConverter authConverter = new JwtAuthenticationConverter();
+        authConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+        return authConverter;
     }
 }

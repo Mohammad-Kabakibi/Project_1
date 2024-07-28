@@ -27,7 +27,6 @@ public class ReimbursementController {
     }
 
 
-
     @PostMapping
     @Secured("ROLE_Employee")
     public ResponseEntity<Reimbursement> createReimbursement(@RequestBody @Valid IncomingReimbDTO reimbDTO) throws CustomException {
@@ -48,7 +47,7 @@ public class ReimbursementController {
 
     @GetMapping("/pending")
     @Secured({"ROLE_Manager","ROLE_Employee"})
-    public ResponseEntity<List<Reimbursement>> getLoggedInUserPendingReimbursements(){
+    public ResponseEntity<List<Reimbursement>> getPendingReimbursements(){
         List<Reimbursement> reimbursements;
         if(isManager())
             reimbursements = reimbursementService.getPendingReimbursements();

@@ -51,10 +51,10 @@ public class JwtAuthenticationResource {
     private String createToken(Authentication authentication, int id) {
         var claims = JwtClaimsSet.builder()
                 .issuer("self")
+                .subject(authentication.getName())
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plusSeconds(60 * 60))
                 .claim("userId",id)
-                .claim("username",authentication.getName())
                 .claim("scope", createScope(authentication))
                 .build();
 
