@@ -28,14 +28,14 @@ public class ReimbursementController {
 
 
     @PostMapping
-    @Secured("ROLE_Employee")
+    @Secured("Employee")
     public ResponseEntity<Reimbursement> createReimbursement(@RequestBody @Valid IncomingReimbDTO reimbDTO) throws CustomException {
         Reimbursement reimb = reimbursementService.createReimbursement(reimbDTO);
         return ResponseEntity.status(201).body(reimb);
     }
 
     @GetMapping
-    @Secured({"ROLE_Manager","ROLE_Employee"})
+    @Secured({"Manager","Employee"})
     public ResponseEntity<List<Reimbursement>> getAllReimbursements(){
         List<Reimbursement> reimbursements;
         if(isManager())
@@ -46,7 +46,7 @@ public class ReimbursementController {
     }
 
     @GetMapping("/pending")
-    @Secured({"ROLE_Manager","ROLE_Employee"})
+    @Secured({"Manager","Employee"})
     public ResponseEntity<List<Reimbursement>> getPendingReimbursements(){
         List<Reimbursement> reimbursements;
         if(isManager())
@@ -58,7 +58,7 @@ public class ReimbursementController {
 
 
     @PatchMapping("/{id}")
-    @Secured({"ROLE_Manager","ROLE_Employee"})
+    @Secured({"Manager","Employee"})
     public ResponseEntity<Object> updateReimbursement(@PathVariable String id, @RequestBody HashMap<String,Object> newReimbursement) throws CustomException {
         try{
             int reimbursement_id = Integer.parseInt(id);
@@ -80,7 +80,7 @@ public class ReimbursementController {
 //    }
 
     private boolean isManager(){
-        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_Manager"));
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("Manager"));
     }
 
 }

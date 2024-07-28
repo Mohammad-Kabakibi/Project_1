@@ -50,14 +50,14 @@ public class UserController {
     }
 
     @GetMapping
-    @Secured("ROLE_Manager")
+    @Secured("Manager")
     public ResponseEntity<List<User>> getAllUsers(){
         var users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
     @DeleteMapping("/{id}")
-    @Secured("ROLE_Manager")
+    @Secured("Manager")
     public ResponseEntity<Object> deleteUser(@PathVariable String id) throws CustomException {
         try {
             int user_id = Integer.parseInt(id);
@@ -71,7 +71,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    @Secured("ROLE_Manager")
+    @Secured("Manager")
     public ResponseEntity<Object> updateUser(@PathVariable String id, @RequestBody HashMap<String,Object> newUser) throws CustomException {
         try{
             int user_id = Integer.parseInt(id);
@@ -83,7 +83,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/reimbursements")
-    @Secured("ROLE_Manager")
+    @Secured("Manager")
     public ResponseEntity<Object> getReimbursementsByUserId(@PathVariable String id) throws CustomException {
         try{
             int user_id = Integer.parseInt(id);

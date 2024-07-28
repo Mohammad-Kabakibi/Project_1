@@ -16,11 +16,11 @@ public class RoleService {
     }
 
     public Role getEmployeeRole(){
-        return roleDAO.findByName("ROLE_Employee");
+        return roleDAO.findByName("Employee");
     }
 
     public Role getManagerRole(){
-        return roleDAO.findByName("ROLE_Manager");
+        return roleDAO.findByName("Manager");
     }
 
 //    public Role getRoleById(int roleId) {
