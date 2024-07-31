@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.HashMap;
 
 import com.revature.Project_1.DAO.UserDAO;
+import com.revature.Project_1.exception.CustomException;
 import com.revature.Project_1.model.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,22 +32,29 @@ public class JwtAuthenticationResource {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<Object> authenticate(@RequestBody HashMap<String, String> login) {
+    public ResponseEntity<Object> authenticate(@RequestBody HashMap<String, String> login) throws CustomException {
         if(!(login.containsKey("username") && login.containsKey("password")))
             return ResponseEntity.badRequest().body("please enter username and password.");
 
         var user_optional = userDAO.findByUsername(login.get("username"));
         if(user_optional.isEmpty())
-            return ResponseEntity.badRequest().body("No account found (username : "+login.get("username")+").");
+            throw new CustomException("No account found (username : "+login.get("username")+").");
+//            return ResponseEntity.badRequest().body("No account found (username : "+login.get("username")+").");
         Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login.get("username"),
                     login.get("password")));
         }catch (Exception ex){
-            return ResponseEntity.badRequest().body("wrong password.");
+//            return ResponseEntity.badRequest().body("wrong password.");
+            throw new CustomException("Wrong Password.");
         }
         User user = user_optional.get();
         return ResponseEntity.ok(new JwtResponse(createToken(authentication, user.getUserId())));
+    }
+
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<Object> handleCustomException( CustomException e){
+        return ResponseEntity.status(e.getStatus()).body(e.getMsg());
     }
 
     private String createToken(Authentication authentication, int id) {

@@ -11,6 +11,8 @@ import jakarta.validation.Validation;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,6 +36,7 @@ public class ReimbursementService {
         reimb.setAmount(reimbursement.getAmount());
         //Set status to pending as default
         reimb.setStatus("pending");
+        reimb.setCreatedAt(Date.from(Instant.now()));
 
         //TODO: BUSINESS LOGIC: GET user_id from current session
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -82,7 +85,7 @@ public class ReimbursementService {
         return reimbursementDAO.findByUser_userId(userId);
     }
 
-    public Reimbursement updateReimbursementById(int reimbursementId, HashMap<String, Object> newReimbursement, boolean isManager) throws CustomException {
+    public Reimbursement updateReimbursementById(int reimbursementId, HashMap<String, String> newReimbursement, boolean isManager) throws CustomException {
         var reimbursement_optional = reimbursementDAO.findById(reimbursementId);
         if(reimbursement_optional.isEmpty())
             throw new ReimbursementNotFoundException(reimbursementId);
@@ -93,11 +96,15 @@ public class ReimbursementService {
             throw new ForbiddenActionException("you cannot update non-pending reimbursements");
 
         if(newReimbursement.containsKey("description"))
-            reimbursement.setDescription((String) newReimbursement.get("description"));
+            reimbursement.setDescription(newReimbursement.get("description"));
 //        if(isManager && newReimbursement.containsKey("amount"))
-//            reimbursement.setAmount(Float.parseFloat(newReimbursement.get("amount").toString()));
-        if(isManager && newReimbursement.containsKey("status"))
-            reimbursement.setStatus((String) newReimbursement.get("status"));
+//            reimbursement.setAmount(Float.parseFloat(newReimbursement.get("amount")));
+        if(isManager && newReimbursement.containsKey("status")) {
+            reimbursement.setStatus(newReimbursement.get("status"));
+            reimbursement.setResolvedAt(Date.from(Instant.now()));
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            reimbursement.setResolvedBy(userDAO.findByUsername(username).get());
+        }
 
         try(var validator = Validation.buildDefaultValidatorFactory()){
             var errs = validator.getValidator().validate(reimbursement);
@@ -108,5 +115,46 @@ public class ReimbursementService {
             }
         }
         return reimbursementDAO.save(reimbursement);
+    }
+
+    public List<Reimbursement> getReimbursementsResolvedByManager() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return reimbursementDAO.findByResolvedBy_username(username);
+    }
+
+    public List<Reimbursement> getReimbursementsResolvedBefore(String date_str) throws InvalidDateException {
+        Date date = valueOf(date_str);
+        return reimbursementDAO.findByResolvedAtBefore(date);
+    }
+
+    public List<Reimbursement> getReimbursementsResolvedAfter(String date_str) throws InvalidDateException {
+        Date date = valueOf(date_str);
+        if(date.after(Date.from(Instant.now())))
+            throw new InvalidDateException("Date cannot be in the future.");
+        return reimbursementDAO.findByResolvedAtAfter(date);
+    }
+
+    public List<Reimbursement> getReimbursementsResolvedBetween(String date1_str, String date2_str) throws InvalidDateException {
+        Date date1 = valueOf(date1_str);
+        Date date2 = valueOf(date2_str);
+        if(date1.after(date2))
+            throw new InvalidDateException("Date1 cannot be after Date2.");
+        return reimbursementDAO.findByResolvedAtBetween(date1,date2);
+    }
+
+//    public List<Reimbursement> getReimbursementsResolvedAfter(Date date) {
+//        return reimbursementDAO.findByResolvedBy_username(username);
+//    }
+//
+//    public List<Reimbursement> getReimbursementsResolvedBetween(Date date1, Date date2) {
+//        return reimbursementDAO.findByResolvedBy_username(username);
+//    }
+
+    private Date valueOf(String date) throws InvalidDateException {
+        try{
+            return Date.valueOf(date);
+        }catch (Exception q){
+            throw new InvalidDateException();
+        }
     }
 }

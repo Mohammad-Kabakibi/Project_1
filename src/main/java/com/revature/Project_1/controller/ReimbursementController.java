@@ -1,6 +1,7 @@
 package com.revature.Project_1.controller;
 
 import com.revature.Project_1.exception.CustomException;
+import com.revature.Project_1.exception.InvalidDateException;
 import com.revature.Project_1.exception.InvalidIDException;
 import com.revature.Project_1.model.DTO.IncomingReimbDTO;
 import com.revature.Project_1.model.Reimbursement;
@@ -59,7 +60,7 @@ public class ReimbursementController {
 
     @PatchMapping("/{id}")
     @Secured({"Manager","Employee"})
-    public ResponseEntity<Object> updateReimbursement(@PathVariable String id, @RequestBody HashMap<String,Object> newReimbursement) throws CustomException {
+    public ResponseEntity<Object> updateReimbursement(@PathVariable String id, @RequestBody HashMap<String,String> newReimbursement) throws CustomException {
         try{
             int reimbursement_id = Integer.parseInt(id);
             var reimbursement = reimbursementService.updateReimbursementById(reimbursement_id, newReimbursement, isManager());
@@ -67,6 +68,34 @@ public class ReimbursementController {
         }catch (NumberFormatException ex){
             throw new InvalidIDException();
         }
+    }
+
+    @GetMapping("/resolved/after/{date}")
+    @Secured("Manager")
+    public ResponseEntity<List<Reimbursement>> getReimbursementsResolvedAfter(@PathVariable String date) throws InvalidDateException {
+        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedAfter(date);
+        return ResponseEntity.ok(reimbursements);
+    }
+
+    @GetMapping("/resolved/before/{date}")
+    @Secured("Manager")
+    public ResponseEntity<List<Reimbursement>> getReimbursementsResolvedBefore(@PathVariable String date) throws InvalidDateException {
+        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedBefore(date);
+        return ResponseEntity.ok(reimbursements);
+    }
+
+    @GetMapping("/resolved/between/{date1}/{date2}")
+    @Secured("Manager")
+    public ResponseEntity<List<Reimbursement>> getReimbursementsResolvedByManager(@PathVariable String date1, @PathVariable String date2) throws InvalidDateException {
+        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedBetween(date1,date2);
+        return ResponseEntity.ok(reimbursements);
+    }
+
+    @GetMapping("/resolved_by_me")
+    @Secured("Manager")
+    public ResponseEntity<List<Reimbursement>> getReimbursementsResolvedByManager(){
+        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedByManager();
+        return ResponseEntity.ok(reimbursements);
     }
 
     @ExceptionHandler(CustomException.class)
