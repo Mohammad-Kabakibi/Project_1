@@ -31,7 +31,7 @@ public class ReimbursementController {
     @PostMapping
     @Secured("Employee")
     public ResponseEntity<Reimbursement> createReimbursement(@RequestBody @Valid IncomingReimbDTO reimbDTO) throws CustomException {
-        Reimbursement reimb = reimbursementService.createReimbursement(reimbDTO);
+        Reimbursement reimb = reimbursementService.createReimbursement(reimbDTO, username());
         return ResponseEntity.status(201).body(reimb);
     }
 
@@ -42,7 +42,7 @@ public class ReimbursementController {
         if(isManager())
             reimbursements = reimbursementService.getAllReimbursements();
         else
-            reimbursements = reimbursementService.getLoggedInUserReimbursements();
+            reimbursements = reimbursementService.getLoggedInUserReimbursements(username());
         return ResponseEntity.ok(reimbursements);
     }
 
@@ -53,7 +53,7 @@ public class ReimbursementController {
         if(isManager())
             reimbursements = reimbursementService.getPendingReimbursements();
         else
-            reimbursements = reimbursementService.getLoggedInUserPendingReimbursements();
+            reimbursements = reimbursementService.getLoggedInUserPendingReimbursements(username());
         return ResponseEntity.ok(reimbursements);
     }
 
@@ -63,7 +63,7 @@ public class ReimbursementController {
     public ResponseEntity<Object> updateReimbursement(@PathVariable String id, @RequestBody HashMap<String,String> newReimbursement) throws CustomException {
         try{
             int reimbursement_id = Integer.parseInt(id);
-            var reimbursement = reimbursementService.updateReimbursementById(reimbursement_id, newReimbursement, isManager());
+            var reimbursement = reimbursementService.updateReimbursementById(reimbursement_id, newReimbursement, isManager(), username());
             return ResponseEntity.ok(reimbursement);
         }catch (NumberFormatException ex){
             throw new InvalidIDException();
@@ -73,28 +73,28 @@ public class ReimbursementController {
     @GetMapping("/resolved/after/{date}")
     @Secured("Manager")
     public ResponseEntity<List<Reimbursement>> getReimbursementsResolvedAfter(@PathVariable String date, @RequestParam(defaultValue = "false") boolean by_me) throws InvalidDateException {
-        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedAfter(date, by_me);
+        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedAfter(date, by_me, username());
         return ResponseEntity.ok(reimbursements);
     }
 
     @GetMapping("/resolved/before/{date}")
     @Secured("Manager")
     public ResponseEntity<List<Reimbursement>> getReimbursementsResolvedBefore(@PathVariable String date, @RequestParam(defaultValue = "false") boolean by_me) throws InvalidDateException {
-        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedBefore(date, by_me);
+        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedBefore(date, by_me, username());
         return ResponseEntity.ok(reimbursements);
     }
 
     @GetMapping("/resolved/between/{date1}/{date2}")
     @Secured("Manager")
     public ResponseEntity<List<Reimbursement>> getReimbursementsResolvedByManager(@PathVariable String date1, @PathVariable String date2, @RequestParam(defaultValue = "false") boolean by_me) throws InvalidDateException {
-        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedBetween(date1, date2, by_me);
+        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedBetween(date1, date2, by_me, username());
         return ResponseEntity.ok(reimbursements);
     }
 
     @GetMapping("/resolved_by_me")
     @Secured("Manager")
     public ResponseEntity<List<Reimbursement>> getReimbursementsResolvedByManager(){
-        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedByManager();
+        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedByManager(username());
         return ResponseEntity.ok(reimbursements);
     }
 
@@ -110,6 +110,10 @@ public class ReimbursementController {
 
     private boolean isManager(){
         return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("Manager"));
+    }
+
+    private String username(){
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
 }
