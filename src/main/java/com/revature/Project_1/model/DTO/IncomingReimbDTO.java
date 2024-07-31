@@ -5,15 +5,13 @@ package com.revature.Project_1.model.DTO;
 public class IncomingReimbDTO {
     private String description;
     private float amount;
-    private int userId;
 
     public IncomingReimbDTO() {
     }
 
-    public IncomingReimbDTO(String descriptioon, float amount, int userId) {
+    public IncomingReimbDTO(String descriptioon, float amount) {
         this.description = descriptioon;
         this.amount = amount;
-        this.userId = userId;
     }
 
     public String getDescription() {
@@ -30,13 +28,5 @@ public class IncomingReimbDTO {
 
     public void setAmount(float amount) {
         this.amount = amount;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
     }
 }

@@ -41,7 +41,7 @@ public class ReimbursementServiceTest {
     public void testCreateReimbursement() throws Exception {
         User user = new User(1, "fname", "lname", "uname", "12345",null);
         Reimbursement reimbursement = new Reimbursement(1, "some description", 1000, "pending", user, null, Date.from(Instant.now()), null);
-        IncomingReimbDTO incomingReimbDTO = new IncomingReimbDTO("some description", 1000, 1);
+        IncomingReimbDTO incomingReimbDTO = new IncomingReimbDTO("some description", 1000);
 
         when(reimbursementDAO.save(any(Reimbursement.class))).thenReturn(reimbursement);
         when(userDAO.findByUsername("uname")).thenReturn(Optional.of(user));
