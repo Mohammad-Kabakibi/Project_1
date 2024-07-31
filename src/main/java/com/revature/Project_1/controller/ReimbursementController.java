@@ -72,22 +72,22 @@ public class ReimbursementController {
 
     @GetMapping("/resolved/after/{date}")
     @Secured("Manager")
-    public ResponseEntity<List<Reimbursement>> getReimbursementsResolvedAfter(@PathVariable String date) throws InvalidDateException {
-        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedAfter(date);
+    public ResponseEntity<List<Reimbursement>> getReimbursementsResolvedAfter(@PathVariable String date, @RequestParam(defaultValue = "false") boolean by_me) throws InvalidDateException {
+        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedAfter(date, by_me);
         return ResponseEntity.ok(reimbursements);
     }
 
     @GetMapping("/resolved/before/{date}")
     @Secured("Manager")
-    public ResponseEntity<List<Reimbursement>> getReimbursementsResolvedBefore(@PathVariable String date) throws InvalidDateException {
-        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedBefore(date);
+    public ResponseEntity<List<Reimbursement>> getReimbursementsResolvedBefore(@PathVariable String date, @RequestParam(defaultValue = "false") boolean by_me) throws InvalidDateException {
+        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedBefore(date, by_me);
         return ResponseEntity.ok(reimbursements);
     }
 
     @GetMapping("/resolved/between/{date1}/{date2}")
     @Secured("Manager")
-    public ResponseEntity<List<Reimbursement>> getReimbursementsResolvedByManager(@PathVariable String date1, @PathVariable String date2) throws InvalidDateException {
-        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedBetween(date1,date2);
+    public ResponseEntity<List<Reimbursement>> getReimbursementsResolvedByManager(@PathVariable String date1, @PathVariable String date2, @RequestParam(defaultValue = "false") boolean by_me) throws InvalidDateException {
+        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedBetween(date1, date2, by_me);
         return ResponseEntity.ok(reimbursements);
     }
 

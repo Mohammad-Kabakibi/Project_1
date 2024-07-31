@@ -22,4 +22,8 @@ public interface ReimbursementDAO extends JpaRepository<Reimbursement,Integer> {
     List<Reimbursement> findByResolvedAtBefore(Date date);
     List<Reimbursement> findByResolvedAtAfter(Date date);
     List<Reimbursement> findByResolvedAtBetween(Date date1, Date date2);
+
+    List<Reimbursement> findByResolvedAtAfterAndResolvedBy_username(Date date, String username);
+    List<Reimbursement> findByResolvedAtBeforeAndResolvedBy_username(Date date, String username);
+    List<Reimbursement> findByResolvedAtBetweenAndResolvedBy_username(Date date1, Date date2, String username);
 }

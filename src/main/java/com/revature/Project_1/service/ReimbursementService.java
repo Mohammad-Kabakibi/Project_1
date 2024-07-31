@@ -39,8 +39,7 @@ public class ReimbursementService {
         reimb.setCreatedAt(Date.from(Instant.now()));
 
         //TODO: BUSINESS LOGIC: GET user_id from current session
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userDAO.findByUsername(username).get();
+        User user = userDAO.findByUsername(username()).get();
         reimb.setUser(user);
 
         try(var validator = Validation.buildDefaultValidatorFactory()){
@@ -58,13 +57,11 @@ public class ReimbursementService {
     }
 
     public List<Reimbursement> getLoggedInUserReimbursements() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return reimbursementDAO.findByUser_username(username);
+        return reimbursementDAO.findByUser_username(username());
     }
 
     public List<Reimbursement> getLoggedInUserPendingReimbursements() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return reimbursementDAO.findByStatusAndUser_username("pending", username);
+        return reimbursementDAO.findByStatusAndUser_username("pending", username());
     }
 
 
@@ -102,8 +99,7 @@ public class ReimbursementService {
         if(isManager && newReimbursement.containsKey("status")) {
             reimbursement.setStatus(newReimbursement.get("status"));
             reimbursement.setResolvedAt(Date.from(Instant.now()));
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            reimbursement.setResolvedBy(userDAO.findByUsername(username).get());
+            reimbursement.setResolvedBy(userDAO.findByUsername(username()).get());
         }
 
         try(var validator = Validation.buildDefaultValidatorFactory()){
@@ -118,28 +114,33 @@ public class ReimbursementService {
     }
 
     public List<Reimbursement> getReimbursementsResolvedByManager() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return reimbursementDAO.findByResolvedBy_username(username);
+        return reimbursementDAO.findByResolvedBy_username(username());
     }
 
-    public List<Reimbursement> getReimbursementsResolvedBefore(String date_str) throws InvalidDateException {
+    public List<Reimbursement> getReimbursementsResolvedBefore(String date_str, boolean by_me) throws InvalidDateException {
         Date date = valueOf(date_str);
+        if(by_me)
+            return reimbursementDAO.findByResolvedAtBeforeAndResolvedBy_username(date, username());
         return reimbursementDAO.findByResolvedAtBefore(date);
     }
 
-    public List<Reimbursement> getReimbursementsResolvedAfter(String date_str) throws InvalidDateException {
+    public List<Reimbursement> getReimbursementsResolvedAfter(String date_str, boolean by_me) throws InvalidDateException {
         Date date = valueOf(date_str);
         if(date.after(Date.from(Instant.now())))
             throw new InvalidDateException("Date cannot be in the future.");
+        if(by_me)
+            return reimbursementDAO.findByResolvedAtAfterAndResolvedBy_username(date, username());
         return reimbursementDAO.findByResolvedAtAfter(date);
     }
 
-    public List<Reimbursement> getReimbursementsResolvedBetween(String date1_str, String date2_str) throws InvalidDateException {
+    public List<Reimbursement> getReimbursementsResolvedBetween(String date1_str, String date2_str, boolean by_me) throws InvalidDateException {
         Date date1 = valueOf(date1_str);
         Date date2 = valueOf(date2_str);
         if(date1.after(date2))
             throw new InvalidDateException("Date1 cannot be after Date2.");
-        return reimbursementDAO.findByResolvedAtBetween(date1,date2);
+        if(by_me)
+            return reimbursementDAO.findByResolvedAtBetweenAndResolvedBy_username(date1, date2, username());
+        return reimbursementDAO.findByResolvedAtBetween(date1, date2);
     }
 
 //    public List<Reimbursement> getReimbursementsResolvedAfter(Date date) {
@@ -156,5 +157,9 @@ public class ReimbursementService {
         }catch (Exception q){
             throw new InvalidDateException();
         }
+    }
+    
+    private String username(){
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 }
