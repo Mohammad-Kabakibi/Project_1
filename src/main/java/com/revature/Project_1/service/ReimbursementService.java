@@ -82,6 +82,8 @@ public class ReimbursementService {
     }
 
     public Reimbursement updateReimbursementById(int reimbursementId, HashMap<String, String> newReimbursement, boolean isManager, String username) throws CustomException {
+        if(reimbursementId <= 0)
+            throw new InvalidIDException();
         var reimbursement_optional = reimbursementDAO.findById(reimbursementId);
         if(reimbursement_optional.isEmpty())
             throw new ReimbursementNotFoundException(reimbursementId);
@@ -93,12 +95,15 @@ public class ReimbursementService {
 
         if(newReimbursement.containsKey("description"))
             reimbursement.setDescription(newReimbursement.get("description"));
-//        if(isManager && newReimbursement.containsKey("amount"))
-//            reimbursement.setAmount(Float.parseFloat(newReimbursement.get("amount")));
-        if(isManager && newReimbursement.containsKey("status")) {
-            reimbursement.setStatus(newReimbursement.get("status"));
-            reimbursement.setResolvedAt(Date.from(Instant.now()));
-            reimbursement.setResolvedBy(userDAO.findByUsername(username).get());
+
+        if(newReimbursement.containsKey("status")) {
+            if(isManager) {
+                reimbursement.setStatus(newReimbursement.get("status"));
+                reimbursement.setResolvedAt(Date.from(Instant.now()));
+                reimbursement.setResolvedBy(userDAO.findByUsername(username).get());
+            }
+            else
+                throw new ForbiddenActionException("you cannot update reimbursements status");
         }
 
         try(var validator = Validation.buildDefaultValidatorFactory()){
