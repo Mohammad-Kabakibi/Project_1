@@ -70,23 +70,26 @@ public class UserService {
             throw new UserNotFoundException(userId);
 
         User user = user_optional.get();
-
-        if(newUser.containsKey("firstName"))
-            user.setFirstName((String) newUser.get("firstName"));
-        if(newUser.containsKey("lastName"))
-            user.setLastName((String) newUser.get("lastName"));
-        if(newUser.containsKey("username"))
-            user.setUsername((String) newUser.get("username"));
-        if(newUser.containsKey("password")) {
-            String password = (String) newUser.get("password");
-            user.setPassword(JwtSecurityConfiguration.passwordEncoder().encode(password));
-        }
         if(newUser.containsKey("role")){
 //                int role_id = Integer.parseInt((String)newUser.get("role"));
 //                Role role = roleService.getRoleById(role_id);
             Role role = roleService.getManagerRole();
             user.setRole(role);
         }
+        return userDAO.save(user);
+    }
+
+    public User updateLoggedInUserById(String username, HashMap<String,String> newUser) throws CustomException {
+        User user = userDAO.findByUsername(username).get();
+
+        if(newUser.containsKey("firstName"))
+            user.setFirstName(newUser.get("firstName"));
+        if(newUser.containsKey("lastName"))
+            user.setLastName(newUser.get("lastName"));
+        if(newUser.containsKey("username"))
+            user.setUsername(newUser.get("username"));
+        if(newUser.containsKey("password"))
+            user.setPassword(newUser.get("password")); // not encrypting here for the validation
 
         try(var validator = Validation.buildDefaultValidatorFactory()){
             var errs = validator.getValidator().validate(user);
@@ -95,12 +98,18 @@ public class UserService {
                 errs.forEach(err -> exception.addMessage(err.getPropertyPath().toString(),err.getMessage()));
                 throw exception;
             }
-            // checking if username already exists
-            var u = userDAO.findByUsername(user.getUsername());
-            if(u.isPresent())
-                if(u.get().getUserId() != user.getUserId())
-                    throw new UsernameAlreadyExistsException(user.getUsername());
         }
+        // checking if username already exists
+        var u = userDAO.findByUsername(user.getUsername());
+        if(u.isPresent())
+            if(u.get().getUserId() != user.getUserId())
+                throw new UsernameAlreadyExistsException(user.getUsername());
+
+        if(newUser.containsKey("password")) { // encrypting the new password
+            String password = newUser.get("password");
+            user.setPassword(JwtSecurityConfiguration.passwordEncoder().encode(password));
+        }
+        
         return userDAO.save(user);
     }
 }

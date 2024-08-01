@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -82,6 +83,13 @@ public class UserController {
         }
     }
 
+    @PatchMapping
+    @Secured({"Manager","Employee"})
+    public ResponseEntity<Object> updateLoggedInUser(@RequestBody HashMap<String,String> newUser) throws CustomException {
+        var user = userService.updateLoggedInUserById(username(), newUser);
+        return ResponseEntity.ok(user);
+    }
+
     @GetMapping("/{id}/reimbursements")
     @Secured("Manager")
     public ResponseEntity<Object> getReimbursementsByUserId(@PathVariable String id) throws CustomException {
@@ -94,4 +102,7 @@ public class UserController {
         }
     }
 
+    private String username(){
+        return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
 }
