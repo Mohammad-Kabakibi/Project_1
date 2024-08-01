@@ -18,6 +18,9 @@ public class UserService {
     private UserDAO userDAO;
     private RoleService roleService;
 
+    public UserService() {
+    }
+
     @Autowired
     public UserService(UserDAO userDAO, RoleService roleService) {
         this.userDAO = userDAO;
