@@ -48,7 +48,7 @@ public class JwtSecurityConfiguration{
                                 SessionCreationPolicy.STATELESS)
         );
 
-        http.httpBasic(withDefaults()); // basic auth
+//        http.httpBasic(withDefaults()); // basic auth
 
         http.csrf(csrf -> csrf.disable());
 
