@@ -81,6 +81,62 @@ public class ReimbursementService {
         return reimbursementDAO.findByUser_userId(userId);
     }
 
+    //Update reimbursement description
+    public Reimbursement updateReimbursementDescription(int reimbursementId, String description, String username) throws CustomException {
+        if(reimbursementId <= 0)
+            throw new InvalidIDException();
+        var reimbursement_optional = reimbursementDAO.findById(reimbursementId);
+        if(reimbursement_optional.isEmpty())
+            throw new ReimbursementNotFoundException(reimbursementId);
+
+        Reimbursement reimbursement = reimbursement_optional.get();
+
+        if(!reimbursement.getUser().getUsername().equals(username))
+            throw new ForbiddenActionException("You can only update your own reimbursement");
+
+        if(!reimbursement.getStatus().equals("pending"))
+            throw new ForbiddenActionException("you cannot update non-pending reimbursements");
+
+
+        reimbursement.setDescription(description);
+
+        try(var validator = Validation.buildDefaultValidatorFactory()){
+            var errs = validator.getValidator().validate(reimbursement);
+            if(!errs.isEmpty()){
+                var exception = new InvalidReimbursementException();
+                errs.forEach(err -> exception.addMessage(err.getPropertyPath().toString(),err.getMessage()));
+                throw exception;
+            }
+        }
+        return reimbursementDAO.save(reimbursement);
+    }
+
+    //Resolve reimbursement by manager
+    public Reimbursement resolveReimbursementById(int reimbursementId, String status, String managerUsername) throws CustomException {
+        if(reimbursementId <= 0)
+            throw new InvalidIDException();
+        var reimbursement_optional = reimbursementDAO.findById(reimbursementId);
+        if(reimbursement_optional.isEmpty())
+            throw new ReimbursementNotFoundException(reimbursementId);
+
+        Reimbursement reimbursement = reimbursement_optional.get();
+
+        reimbursement.setStatus(status);
+        reimbursement.setResolvedAt(Date.from(Instant.now()));
+        reimbursement.setResolvedBy(userDAO.findByUsername(managerUsername).get());
+
+        try(var validator = Validation.buildDefaultValidatorFactory()){
+            var errs = validator.getValidator().validate(reimbursement);
+            if(!errs.isEmpty()){
+                var exception = new InvalidReimbursementException();
+                errs.forEach(err -> exception.addMessage(err.getPropertyPath().toString(),err.getMessage()));
+                throw exception;
+            }
+        }
+        return reimbursementDAO.save(reimbursement);
+    }
+
+    /*
     public Reimbursement updateReimbursementById(int reimbursementId, HashMap<String, String> newReimbursement, boolean isManager, String username) throws CustomException {
         if(reimbursementId <= 0)
             throw new InvalidIDException();
@@ -116,6 +172,7 @@ public class ReimbursementService {
         }
         return reimbursementDAO.save(reimbursement);
     }
+     */
 
     public List<Reimbursement> getReimbursementsResolvedByManager(String username) {
         return reimbursementDAO.findByResolvedBy_username(username);

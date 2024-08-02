@@ -57,7 +57,34 @@ public class ReimbursementController {
         return ResponseEntity.ok(reimbursements);
     }
 
+    //Employee can update description of their reimbursement
+    @PatchMapping("/{id}")
+    @Secured({"Employee"})
+    public ResponseEntity<Object> updateReimbursementDescription(@PathVariable String id, @RequestBody String description) throws CustomException {
+        try{
+            int reimbursement_id = Integer.parseInt(id);
+            var reimbursement = reimbursementService.updateReimbursementDescription(reimbursement_id, description, username());
+            return ResponseEntity.ok(reimbursement);
+        }catch (NumberFormatException ex){
+            throw new InvalidIDException();
+        }
+    }
 
+
+    //Resolve a reimbursement
+    @PatchMapping("/resolve/{id}")
+    @Secured({"Manager"})
+    public ResponseEntity<Object> resolveReimbursement(@PathVariable String id, @RequestBody String status) throws CustomException {
+        try{
+            int reimbursement_id = Integer.parseInt(id);
+            var reimbursement = reimbursementService.resolveReimbursementById(reimbursement_id,status,username());
+            return ResponseEntity.ok(reimbursement);
+        }catch (NumberFormatException ex){
+            throw new InvalidIDException();
+        }
+    }
+
+    /*
     @PatchMapping("/{id}")
     @Secured({"Manager","Employee"})
     public ResponseEntity<Object> updateReimbursement(@PathVariable String id, @RequestBody HashMap<String,String> newReimbursement) throws CustomException {
@@ -69,6 +96,7 @@ public class ReimbursementController {
             throw new InvalidIDException();
         }
     }
+    */
 
     @GetMapping("/resolved/after/{date}")
     @Secured("Manager")
