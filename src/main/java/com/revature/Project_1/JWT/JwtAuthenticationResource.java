@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import com.revature.Project_1.DAO.UserDAO;
 import com.revature.Project_1.exception.CustomException;
+import com.revature.Project_1.exception.UnauthorizedException;
 import com.revature.Project_1.model.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,8 +38,9 @@ public class JwtAuthenticationResource {
             return ResponseEntity.badRequest().body("please enter username and password.");
 
         var user_optional = userDAO.findByUsername(login.get("username"));
-        if(user_optional.isEmpty())
-            throw new CustomException("No account found (username : "+login.get("username")+").");
+        if(user_optional.isEmpty()){
+            throw new UnauthorizedException("No account found (username : "+login.get("username")+").");
+        }
 //            return ResponseEntity.badRequest().body("No account found (username : "+login.get("username")+").");
         Authentication authentication;
         try {
@@ -46,7 +48,7 @@ public class JwtAuthenticationResource {
                     login.get("password")));
         }catch (Exception ex){
 //            return ResponseEntity.badRequest().body("wrong password.");
-            throw new CustomException("Wrong Password.");
+            throw new UnauthorizedException("Wrong Password.");
         }
         User user = user_optional.get();
         return ResponseEntity.ok(new JwtResponse(createToken(authentication, user.getUserId())));
