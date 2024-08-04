@@ -19,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/user")
 @EnableMethodSecurity(securedEnabled = true)
+@CrossOrigin(origins = "*")
 public class UserController {
 
     private UserService userService;
