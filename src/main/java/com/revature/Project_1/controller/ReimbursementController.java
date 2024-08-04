@@ -21,6 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/reimbursements")
 @EnableMethodSecurity(securedEnabled = true)
+@CrossOrigin(origins = "*")
 public class ReimbursementController {
 
     private ReimbursementService reimbursementService;
@@ -55,6 +56,30 @@ public class ReimbursementController {
         if(isManager())
             reimbursements = reimbursementService.getPendingReimbursements();
         else
+            reimbursements = reimbursementService.getLoggedInUserPendingReimbursements(username());
+        return ResponseEntity.ok(reimbursements);
+    }
+
+    @GetMapping("/approved")
+    @Secured({"Manager","Employee"})
+    public ResponseEntity<List<Reimbursement>> getApprovedReimbursements(){
+        List<Reimbursement> reimbursements;
+        if(isManager())
+            reimbursements = reimbursementService.getApprovedReimbursements();
+        else
+            //TODO: Approved Reimbursements for Employee
+            reimbursements = reimbursementService.getLoggedInUserPendingReimbursements(username());
+        return ResponseEntity.ok(reimbursements);
+    }
+
+    @GetMapping("/denied")
+    @Secured({"Manager","Employee"})
+    public ResponseEntity<List<Reimbursement>> getDeniedReimbursements(){
+        List<Reimbursement> reimbursements;
+        if(isManager())
+            reimbursements = reimbursementService.getDeniedReimbursements();
+        else
+            //TODO: Denied Reimbursements for Employee
             reimbursements = reimbursementService.getLoggedInUserPendingReimbursements(username());
         return ResponseEntity.ok(reimbursements);
     }
