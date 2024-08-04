@@ -6,14 +6,15 @@ import com.revature.Project_1.exception.InvalidIDException;
 import com.revature.Project_1.model.DTO.IncomingReimbDTO;
 import com.revature.Project_1.model.Reimbursement;
 import com.revature.Project_1.service.ReimbursementService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -27,6 +28,11 @@ public class ReimbursementController {
         this.reimbursementService = reimbursementService;
     }
 
+
+    @Before("*")
+    private void log_to_console(HttpServletRequest r){
+        System.out.println(r.getContextPath());
+    }
 
     @PostMapping
     @Secured("Employee")
