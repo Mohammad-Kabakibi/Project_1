@@ -38,7 +38,7 @@ public class JwtSecurityConfiguration{
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(
                 auth -> {
-                    auth.requestMatchers(HttpMethod.POST,"/authenticate").permitAll().anyRequest().authenticated();
+                    auth.requestMatchers(HttpMethod.POST,"/authenticate","/user").permitAll().anyRequest().authenticated();
 //                    auth.anyRequest().permitAll(); // to avoid login for now
                 });
 

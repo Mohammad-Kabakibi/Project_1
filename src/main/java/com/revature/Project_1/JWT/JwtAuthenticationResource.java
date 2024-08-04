@@ -51,7 +51,7 @@ public class JwtAuthenticationResource {
             throw new UnauthorizedException("Wrong Password.");
         }
         User user = user_optional.get();
-        return ResponseEntity.ok(new JwtResponse(createToken(authentication, user.getUserId())));
+        return ResponseEntity.ok(new JwtResponse(createToken(authentication, user.getUserId()), user.getRole().getName()));
     }
 
     @ExceptionHandler(CustomException.class)
@@ -64,7 +64,7 @@ public class JwtAuthenticationResource {
                 .issuer("self")
                 .subject(authentication.getName())
                 .issuedAt(Instant.now())
-                .expiresAt(Instant.now().plusSeconds(60 * 60))
+                .expiresAt(Instant.now().plusSeconds(60 * 60 * 24))
                 .claim("userId",id)
                 .claim("scope", createScope(authentication))
                 .build();
@@ -83,4 +83,4 @@ public class JwtAuthenticationResource {
 
 }
 
-record JwtResponse(String token) {}
+record JwtResponse(String token, String role) {}
