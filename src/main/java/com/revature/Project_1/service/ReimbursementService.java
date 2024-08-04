@@ -73,6 +73,14 @@ public class ReimbursementService {
         return reimbursementDAO.findByStatus("pending");
     }
 
+    public List<Reimbursement> getApprovedReimbursements() {
+        return reimbursementDAO.findByStatus("approved");
+    }
+
+    public List<Reimbursement> getDeniedReimbursements() {
+        return reimbursementDAO.findByStatus("denied");
+    }
+
     public List<Reimbursement> getReimbursementsByUserId(int userId) throws CustomException {
         if(userId <= 0)
             throw new InvalidIDException();
