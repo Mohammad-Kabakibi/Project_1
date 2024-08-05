@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -111,5 +112,9 @@ public class UserService {
         }
         
         return userDAO.save(user);
+    }
+
+    public Optional<User> getByUsername(String username) {
+        return userDAO.findByUsername(username);
     }
 }
