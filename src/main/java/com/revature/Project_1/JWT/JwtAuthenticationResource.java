@@ -6,6 +6,7 @@ import java.util.HashMap;
 import com.revature.Project_1.DAO.UserDAO;
 import com.revature.Project_1.exception.CustomException;
 import com.revature.Project_1.exception.UnauthorizedException;
+import com.revature.Project_1.model.DTO.LoggedInUserDetailsDTO;
 import com.revature.Project_1.model.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -49,7 +50,13 @@ public class JwtAuthenticationResource {
             throw new UnauthorizedException("Wrong Password.");
         }
         User user = user_optional.get();
-        return ResponseEntity.ok(new JwtResponse(createToken(authentication, user.getUserId()), user.getRole().getName()));
+        //Create Logged In user details
+        LoggedInUserDetailsDTO loggedInUserDetails = new LoggedInUserDetailsDTO();
+        loggedInUserDetails.setFirstName(user.getFirstName());
+        loggedInUserDetails.setLastName(user.getLastName());
+        loggedInUserDetails.setUsername(user.getUsername());
+        loggedInUserDetails.setRole(user.getRole().getName());
+        return ResponseEntity.ok(new JwtResponse(createToken(authentication, user.getUserId()), user.getRole().getName(),loggedInUserDetails));
     }
 
     @ExceptionHandler(CustomException.class)
@@ -81,4 +88,4 @@ public class JwtAuthenticationResource {
 
 }
 
-record JwtResponse(String token, String role) {}
+record JwtResponse(String token, String role, LoggedInUserDetailsDTO loggedInUserDetails) {}
