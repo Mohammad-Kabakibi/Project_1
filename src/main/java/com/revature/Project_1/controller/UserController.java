@@ -58,6 +58,13 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    @GetMapping("/me")
+    @Secured({"Manager","Employee"})
+    public ResponseEntity<User> getMyAccount(){
+        var user = userService.getByUsername(username());
+        return ResponseEntity.ok(user.get());
+    }
+
     @DeleteMapping("/{id}")
     @Secured("Manager")
     public ResponseEntity<Object> deleteUser(@PathVariable String id) throws CustomException {
