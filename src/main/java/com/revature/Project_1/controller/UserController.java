@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -58,13 +59,6 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/me")
-    @Secured({"Manager","Employee"})
-    public ResponseEntity<User> getMyAccount(){
-        var user = userService.getByUsername(username());
-        return ResponseEntity.ok(user.get());
-    }
-
     @DeleteMapping("/{id}")
     @Secured("Manager")
     public ResponseEntity<Object> deleteUser(@PathVariable String id) throws CustomException {
@@ -94,7 +88,7 @@ public class UserController {
     @PatchMapping
     @Secured({"Manager","Employee"})
     public ResponseEntity<Object> updateLoggedInUser(@RequestBody HashMap<String,String> newUser) throws CustomException {
-        var user = userService.updateLoggedInUserById(username(), newUser);
+        var user = userService.updateLoggedInUserById(userId(), newUser);
         return ResponseEntity.ok(user);
     }
 
@@ -112,5 +106,9 @@ public class UserController {
 
     private String username(){
         return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+
+    private int userId(){
+        return Integer.parseInt(((Jwt)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getClaims().get("userId").toString());
     }
 }

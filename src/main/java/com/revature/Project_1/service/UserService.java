@@ -80,8 +80,8 @@ public class UserService {
         return userDAO.save(user);
     }
 
-    public User updateLoggedInUserById(String username, HashMap<String,String> newUser) throws CustomException {
-        User user = userDAO.findByUsername(username).get();
+    public User updateLoggedInUserById(int userId, HashMap<String,String> newUser) throws CustomException {
+        User user = userDAO.findById(userId).get();
 
         if(newUser.containsKey("firstName"))
             user.setFirstName(newUser.get("firstName"));

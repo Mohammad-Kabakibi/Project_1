@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public class ReimbursementController {
     @PostMapping
     @Secured("Employee")
     public ResponseEntity<Reimbursement> createReimbursement(@RequestBody @Valid IncomingReimbDTO reimbDTO) throws CustomException {
-        Reimbursement reimb = reimbursementService.createReimbursement(reimbDTO, username());
+        Reimbursement reimb = reimbursementService.createReimbursement(reimbDTO, userId());
         return ResponseEntity.status(201).body(reimb);
     }
 
@@ -42,7 +43,7 @@ public class ReimbursementController {
         if(isManager())
             reimbursements = reimbursementService.getAllReimbursements();
         else
-            reimbursements = reimbursementService.getLoggedInUserReimbursements(username());
+            reimbursements = reimbursementService.getLoggedInUserReimbursements(userId());
         return ResponseEntity.ok(reimbursements);
     }
 
@@ -53,7 +54,7 @@ public class ReimbursementController {
         if(isManager())
             reimbursements = reimbursementService.getPendingReimbursements();
         else
-            reimbursements = reimbursementService.getLoggedInUserPendingReimbursements(username());
+            reimbursements = reimbursementService.getLoggedInUserPendingReimbursements(userId());
         return ResponseEntity.ok(reimbursements);
     }
 
@@ -65,7 +66,7 @@ public class ReimbursementController {
             reimbursements = reimbursementService.getApprovedReimbursements();
         else
             //TODO: Approved Reimbursements for Employee
-            reimbursements = reimbursementService.getLoggedInUserPendingReimbursements(username());
+            reimbursements = reimbursementService.getLoggedInUserPendingReimbursements(userId());
         return ResponseEntity.ok(reimbursements);
     }
 
@@ -77,7 +78,7 @@ public class ReimbursementController {
             reimbursements = reimbursementService.getDeniedReimbursements();
         else
             //TODO: Denied Reimbursements for Employee
-            reimbursements = reimbursementService.getLoggedInUserPendingReimbursements(username());
+            reimbursements = reimbursementService.getLoggedInUserPendingReimbursements(userId());
         return ResponseEntity.ok(reimbursements);
     }
 
@@ -87,7 +88,7 @@ public class ReimbursementController {
     public ResponseEntity<Object> updateReimbursementDescription(@PathVariable String id, @RequestBody String description) throws CustomException {
         try{
             int reimbursement_id = Integer.parseInt(id);
-            var reimbursement = reimbursementService.updateReimbursementDescription(reimbursement_id, description, username());
+            var reimbursement = reimbursementService.updateReimbursementDescription(reimbursement_id, description, userId());
             return ResponseEntity.ok(reimbursement);
         }catch (NumberFormatException ex){
             throw new InvalidIDException();
@@ -101,7 +102,7 @@ public class ReimbursementController {
     public ResponseEntity<Object> resolveReimbursement(@PathVariable String id, @RequestBody String status) throws CustomException {
         try{
             int reimbursement_id = Integer.parseInt(id);
-            var reimbursement = reimbursementService.resolveReimbursementById(reimbursement_id,status,username());
+            var reimbursement = reimbursementService.resolveReimbursementById(reimbursement_id,status,userId());
             return ResponseEntity.ok(reimbursement);
         }catch (NumberFormatException ex){
             throw new InvalidIDException();
@@ -125,29 +126,39 @@ public class ReimbursementController {
     @GetMapping("/resolved/after/{date}")
     @Secured("Manager")
     public ResponseEntity<List<Reimbursement>> getReimbursementsResolvedAfter(@PathVariable String date, @RequestParam(defaultValue = "false") boolean by_me) throws InvalidDateException {
-        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedAfter(date, by_me, username());
+        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedAfter(date, by_me, userId());
         return ResponseEntity.ok(reimbursements);
     }
 
     @GetMapping("/resolved/before/{date}")
     @Secured("Manager")
     public ResponseEntity<List<Reimbursement>> getReimbursementsResolvedBefore(@PathVariable String date, @RequestParam(defaultValue = "false") boolean by_me) throws InvalidDateException {
-        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedBefore(date, by_me, username());
+        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedBefore(date, by_me, userId());
         return ResponseEntity.ok(reimbursements);
     }
 
     @GetMapping("/resolved/between/{date1}/{date2}")
     @Secured("Manager")
     public ResponseEntity<List<Reimbursement>> getReimbursementsResolvedByManager(@PathVariable String date1, @PathVariable String date2, @RequestParam(defaultValue = "false") boolean by_me) throws InvalidDateException {
-        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedBetween(date1, date2, by_me, username());
+        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedBetween(date1, date2, by_me, userId());
         return ResponseEntity.ok(reimbursements);
     }
 
     @GetMapping("/resolved_by_me")
     @Secured("Manager")
     public ResponseEntity<List<Reimbursement>> getReimbursementsResolvedByManager(){
-        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedByManager(username());
+        List<Reimbursement> reimbursements = reimbursementService.getReimbursementsResolvedByManager(userId());
         return ResponseEntity.ok(reimbursements);
+    }
+
+
+    @GetMapping("/resolved/amount")
+    @Secured("Manager")
+    public ResponseEntity<Object> getTotalApprovedReimbursementsAmount() {
+//        var total_amount = reimbursementService.getTotalAmount();
+        System.out.println();
+        var total_amount = 123;
+        return ResponseEntity.ok(new total_amount(total_amount));
     }
 
     @ExceptionHandler(CustomException.class)
@@ -168,4 +179,9 @@ public class ReimbursementController {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
+    private int userId(){
+        return Integer.parseInt(((Jwt)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getClaims().get("userId").toString());
+    }
+
+    record total_amount(double total_amount){};
 }
