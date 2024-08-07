@@ -32,6 +32,10 @@ public class UserService {
         return userDAO.findAll();
     }
 
+    public List<User> getAllEmployees() {
+        return userDAO.findAllByRoleName("Employee");
+    }
+
     public User createUser(User user) throws UsernameAlreadyExistsException{
 
         //Check if the username already exists

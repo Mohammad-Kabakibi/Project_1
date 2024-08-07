@@ -54,8 +54,9 @@ public class UserController {
 
     @GetMapping
     @Secured("Manager")
-    public ResponseEntity<List<User>> getAllUsers(){
-        var users = userService.getAllUsers();
+    //return employees only
+    public ResponseEntity<List<User>> getAllEmployees(){
+        var users = userService.getAllEmployees();
         return ResponseEntity.ok(users);
     }
 
