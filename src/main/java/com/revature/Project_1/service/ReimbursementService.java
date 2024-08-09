@@ -8,6 +8,7 @@ import com.revature.Project_1.model.Reimbursement;
 
 import com.revature.Project_1.model.User;
 import jakarta.validation.Validation;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -64,7 +65,7 @@ public class ReimbursementService {
 
 
     public List<Reimbursement> getAllReimbursements() {
-//        return reimbursementDAO.findAll(Sort.by("reimbId"));
+//        return reimbursementDAO.findAll(Sort.by("createdAt"));
         return reimbursementDAO.findAll();
     }
 

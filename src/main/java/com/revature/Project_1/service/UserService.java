@@ -56,9 +56,11 @@ public class UserService {
     }
 
 
-    public User deleteUserById(int userId) throws CustomException {
+    public User deleteUserById(int userId, int myId) throws CustomException {
         if(userId <= 0)
             throw new InvalidIDException();
+        if(userId == myId)
+            throw new ForbiddenActionException("You Cannot Delete Yourself");
         var user = userDAO.findById(userId);
         if(user.isEmpty())
             throw new UserNotFoundException(userId);
