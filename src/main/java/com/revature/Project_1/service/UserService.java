@@ -36,6 +36,16 @@ public class UserService {
         return userDAO.findAllByRoleName("Employee");
     }
 
+    public User getEmployeeById(int userId) throws UserNotFoundException {
+        Optional<User> optionalUser = userDAO.findById(userId);
+        if(optionalUser.isPresent()){
+            return optionalUser.get();
+        }
+        else{
+            throw new UserNotFoundException(userId);
+        }
+    }
+
     public User createUser(User user) throws UsernameAlreadyExistsException{
 
         //Check if the username already exists

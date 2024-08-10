@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -40,6 +41,21 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonBackReference
     private List<Reimbursement> reimbursements;
+
+    public Date getHiredAt() {
+        return hiredAt;
+    }
+
+    public void setHiredAt(Date hiredAt) {
+        this.hiredAt = hiredAt;
+    }
+
+    private Date hiredAt;
+
+    @PrePersist
+    private void onCreate(){
+        hiredAt = new Date();
+    }
 
 
     //boilerplate code

@@ -2,6 +2,7 @@ package com.revature.Project_1.controller;
 
 import com.revature.Project_1.exception.CustomException;
 import com.revature.Project_1.exception.InvalidIDException;
+import com.revature.Project_1.exception.UserNotFoundException;
 import com.revature.Project_1.model.User;
 import com.revature.Project_1.service.ReimbursementService;
 import com.revature.Project_1.service.UserService;
@@ -58,6 +59,14 @@ public class UserController {
     public ResponseEntity<List<User>> getAllEmployees(){
         var users = userService.getAllEmployees();
         return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/{userId}")
+    @Secured("Manager")
+    //return employees only
+    public ResponseEntity<User> getEmployeeById(@PathVariable int userId) throws UserNotFoundException {
+        var user = userService.getEmployeeById(userId);
+        return ResponseEntity.ok(user);
     }
 
     @DeleteMapping("/{id}")
