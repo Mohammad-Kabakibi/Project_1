@@ -47,7 +47,7 @@ public class ReimbursementControllerTest {
     public void testCreateReimbursement() throws Exception {
         IncomingReimbDTO incomingReimbDTO = new IncomingReimbDTO("some description", 100);
 
-        when(reimbursementService.createReimbursement(incomingReimbDTO,"uname")).thenReturn(new Reimbursement());
+        when(reimbursementService.createReimbursement(incomingReimbDTO,1)).thenReturn(new Reimbursement());
 
         String token = get_token("Employee");
 
@@ -74,14 +74,14 @@ public class ReimbursementControllerTest {
     public void testGetAllReimbursements() throws Exception {
         var list = Arrays.asList(new Reimbursement(), new Reimbursement());
         when(reimbursementService.getAllReimbursements()).thenReturn(list);
-        when(reimbursementService.getLoggedInUserReimbursements("uname")).thenReturn(list);
+        when(reimbursementService.getLoggedInUserReimbursements(1)).thenReturn(list);
 
         String token = get_token("Employee");
         mockMvc.perform(MockMvcRequestBuilders.get("/reimbursements")
                         .header("Authorization","Bearer "+token))
                 .andExpect(status().isOk());
 
-        verify(reimbursementService,times(1)).getLoggedInUserReimbursements("uname");
+        verify(reimbursementService,times(1)).getLoggedInUserReimbursements(1);
 
 
         token = get_token("Manager");
@@ -96,14 +96,14 @@ public class ReimbursementControllerTest {
     public void testGetPendingReimbursements() throws Exception {
         var list = Arrays.asList(new Reimbursement(), new Reimbursement());
         when(reimbursementService.getPendingReimbursements()).thenReturn(list);
-        when(reimbursementService.getLoggedInUserPendingReimbursements("uname")).thenReturn(list);
+        when(reimbursementService.getLoggedInUserPendingReimbursements(1)).thenReturn(list);
 
         String token = get_token("Employee");
         mockMvc.perform(MockMvcRequestBuilders.get("/reimbursements/pending")
                         .header("Authorization","Bearer "+token))
                 .andExpect(status().isOk());
 
-        verify(reimbursementService,times(1)).getLoggedInUserPendingReimbursements("uname");
+        verify(reimbursementService,times(1)).getLoggedInUserPendingReimbursements(1);
 
 
         token = get_token("Manager");
@@ -115,40 +115,46 @@ public class ReimbursementControllerTest {
     }
 
     @Test
-    public void testUpdateReimbursement() throws Exception {
-        var reimbursement = new Reimbursement();
-        var map = new HashMap<String, String>();
-        when(reimbursementService.updateReimbursementById(anyInt(),any(HashMap.class),anyBoolean(),anyString())).thenReturn(reimbursement);
+    public void testResolveReimbursement() throws Exception {
+//        var reimbursement = new Reimbursement();
+//        when(reimbursementService.updateReimbursementDescription(anyInt(),anyString(),anyInt())).thenReturn(reimbursement);
+
+        String token = get_token("Manager");
+        mockMvc.perform(MockMvcRequestBuilders.patch("/reimbursements/resolve/1")
+                        .header("Authorization","Bearer "+token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString("approved")))
+                .andExpect(status().isOk());
+
+        // id as text instead of number
+        mockMvc.perform(MockMvcRequestBuilders.patch("/reimbursements/resolve/text")
+                        .header("Authorization","Bearer "+token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString("approved")))
+                .andExpect(status().isBadRequest());
+
+        verify(reimbursementService,times(1)).resolveReimbursementById(anyInt(),anyString(), anyInt());
+    }
+
+    @Test
+    public void testUpdateReimbursementDescription() throws Exception {
+//        var reimbursement = new Reimbursement();
+//        when(reimbursementService.updateReimbursementDescription(anyInt(),anyString(),anyInt())).thenReturn(reimbursement);
 
         String token = get_token("Employee");
         mockMvc.perform(MockMvcRequestBuilders.patch("/reimbursements/1")
                         .header("Authorization","Bearer "+token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(map)))
+                        .content(objectMapper.writeValueAsString("new description")))
                 .andExpect(status().isOk());
 
-
-        token = get_token("Manager");
-        mockMvc.perform(MockMvcRequestBuilders.patch("/reimbursements/1")
-                        .header("Authorization","Bearer "+token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(map)))
-                .andExpect(status().isOk());
-
-        // id as text instead of number
-        mockMvc.perform(MockMvcRequestBuilders.patch("/reimbursements/text")
-                        .header("Authorization","Bearer "+token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(map)))
-                .andExpect(status().isBadRequest());
-
-        verify(reimbursementService,times(2)).updateReimbursementById(anyInt(),any(HashMap.class),anyBoolean(),anyString());
+        verify(reimbursementService,times(1)).updateReimbursementDescription(anyInt(),anyString(), anyInt());
     }
 
     @Test
     public void testGetReimbursementsResolvedAfter() throws Exception {
         var list = Arrays.asList(new Reimbursement(), new Reimbursement());
-        when(reimbursementService.getReimbursementsResolvedAfter(anyString(),anyBoolean(),anyString())).thenReturn(list);
+        when(reimbursementService.getReimbursementsResolvedAfter(anyString(),anyBoolean(),anyInt())).thenReturn(list);
 
         String token = get_token("Employee"); // forbidden
         mockMvc.perform(MockMvcRequestBuilders.get("/reimbursements/resolved/after/2020-10-10")
@@ -171,15 +177,15 @@ public class ReimbursementControllerTest {
                 .andExpect(status().isBadRequest());
 
         //by_me = false (default)
-        verify(reimbursementService,times(1)).getReimbursementsResolvedAfter("2020-10-10",false,"uname");
+        verify(reimbursementService,times(1)).getReimbursementsResolvedAfter("2020-10-10",false,1);
         //by_me = true
-        verify(reimbursementService,times(1)).getReimbursementsResolvedAfter("2020-10-10",true,"uname");
+        verify(reimbursementService,times(1)).getReimbursementsResolvedAfter("2020-10-10",true,1);
     }
 
     @Test
     public void testGetReimbursementsResolvedBefore() throws Exception {
         var list = Arrays.asList(new Reimbursement(), new Reimbursement());
-        when(reimbursementService.getReimbursementsResolvedBefore(anyString(),anyBoolean(),anyString())).thenReturn(list);
+        when(reimbursementService.getReimbursementsResolvedBefore(anyString(),anyBoolean(),anyInt())).thenReturn(list);
 
         String token = get_token("Employee"); // forbidden
         mockMvc.perform(MockMvcRequestBuilders.get("/reimbursements/resolved/before/2020-10-10")
@@ -202,15 +208,15 @@ public class ReimbursementControllerTest {
                 .andExpect(status().isBadRequest());
 
         //by_me = false (default)
-        verify(reimbursementService,times(1)).getReimbursementsResolvedBefore("2020-10-10",false,"uname");
+        verify(reimbursementService,times(1)).getReimbursementsResolvedBefore("2020-10-10",false,1);
         //by_me = true
-        verify(reimbursementService,times(1)).getReimbursementsResolvedBefore("2020-10-10",true,"uname");
+        verify(reimbursementService,times(1)).getReimbursementsResolvedBefore("2020-10-10",true,1);
     }
 
     @Test
     public void testGetReimbursementsResolvedBetween() throws Exception {
         var list = Arrays.asList(new Reimbursement(), new Reimbursement());
-        when(reimbursementService.getReimbursementsResolvedBetween(anyString(),anyString(),anyBoolean(),anyString())).thenReturn(list);
+        when(reimbursementService.getReimbursementsResolvedBetween(anyString(),anyString(),anyBoolean(),anyInt())).thenReturn(list);
 
         String token = get_token("Employee"); // forbidden
         mockMvc.perform(MockMvcRequestBuilders.get("/reimbursements/resolved/between/2020-10-10/2021-10-10")
@@ -233,9 +239,9 @@ public class ReimbursementControllerTest {
                 .andExpect(status().isBadRequest());
 
         //by_me = false (default)
-        verify(reimbursementService,times(1)).getReimbursementsResolvedBetween("2020-10-10","2021-10-10",false,"uname");
+        verify(reimbursementService,times(1)).getReimbursementsResolvedBetween("2020-10-10","2021-10-10",false,1);
         //by_me = true
-        verify(reimbursementService,times(1)).getReimbursementsResolvedBetween("2020-10-10","2021-10-10",true,"uname");
+        verify(reimbursementService,times(1)).getReimbursementsResolvedBetween("2020-10-10","2021-10-10",true,1);
     }
 
 

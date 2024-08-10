@@ -155,9 +155,7 @@ public class ReimbursementController {
     @GetMapping("/resolved/amount")
     @Secured("Manager")
     public ResponseEntity<Object> getTotalApprovedReimbursementsAmount() {
-//        var total_amount = reimbursementService.getTotalAmount();
-        System.out.println();
-        var total_amount = 123;
+        var total_amount = reimbursementService.getTotalAmount();
         return ResponseEntity.ok(new total_amount(total_amount));
     }
 

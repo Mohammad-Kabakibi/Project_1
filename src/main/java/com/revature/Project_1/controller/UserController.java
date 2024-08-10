@@ -65,7 +65,7 @@ public class UserController {
     public ResponseEntity<Object> deleteUser(@PathVariable String id) throws CustomException {
         try {
             int user_id = Integer.parseInt(id);
-            var user = userService.deleteUserById(user_id);
+            var user = userService.deleteUserById(user_id, userId());
             return ResponseEntity.ok(user);
         }
         catch (NumberFormatException ex){ // if the parsing failed

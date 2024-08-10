@@ -33,7 +33,7 @@ public class Reimbursement {
     private User user;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "managerId")
     private User resolvedBy;
 
