@@ -10,5 +10,5 @@ public class UsernameAlreadyExistsException extends CustomException{
         return new CustomMessage(super.getMessage());
     }
 
-    private record CustomMessage(String username){}
+    private record CustomMessage(String message){}
 }
