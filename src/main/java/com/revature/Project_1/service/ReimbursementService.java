@@ -216,6 +216,49 @@ public class ReimbursementService {
         return reimbursementDAO.findSumAmountByStatus("approved");
     }
 
+    public double getTotalAmountByUserId(int userId) {
+        Double amount = reimbursementDAO.findTotalAmountByUserId(userId);
+        if(amount == null){
+            amount = 0.0;
+        }
+        return amount;
+    }
+
+    public double getAverageAmountByUserId(int userId) {
+        Double amount = reimbursementDAO.findAverageAmountByUserId(userId);
+        if(amount == null){
+            amount = 0.0;
+        }
+
+        // Format the amount to 2 decimal places
+        amount = Math.round(amount * 100.0) / 100.0;
+        return amount;
+    }
+
+    public double getTotalPendingAmountByUserId(int userId) {
+        Double amount =  reimbursementDAO.findTotalAmountByUserIdAndStatus(userId,"pending");
+        if(amount == null){
+            amount = 0.0;
+        }
+        return amount;
+    }
+
+    public double getTotalApprovedAmountByUserId(int userId) {
+        Double amount =  reimbursementDAO.findTotalAmountByUserIdAndStatus(userId,"approved");
+        if(amount == null){
+            amount = 0.0;
+        }
+        return amount;
+    }
+    public double getTotalDeniedAmountByUserId(int userId) {
+        Double amount =  reimbursementDAO.findTotalAmountByUserIdAndStatus(userId,"denied");
+        if(amount == null){
+            amount = 0.0;
+        }
+        return amount;
+    }
+
+
 
     private Date valueOf(String date) throws InvalidDateException {
         try{

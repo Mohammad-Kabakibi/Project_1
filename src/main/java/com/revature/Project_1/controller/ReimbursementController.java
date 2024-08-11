@@ -159,6 +159,46 @@ public class ReimbursementController {
         return ResponseEntity.ok(new total_amount(total_amount));
     }
 
+
+    //Reimbursement Statistics
+    @GetMapping("/total_amount/{userId}/{status}")
+    @Secured("Manager")
+    public ResponseEntity<Double> getTotalReimbursementsAmountByUserId(@PathVariable int userId, @PathVariable String status) {
+        double amount = 0;
+
+        if(status.equals("any")){
+            amount = reimbursementService.getTotalAmountByUserId(userId);
+        }
+        else if(status.equals("pending")){
+            amount = reimbursementService.getTotalPendingAmountByUserId(userId);
+        }
+        else if(status.equals("approved")){
+            amount = reimbursementService.getTotalApprovedAmountByUserId(userId);
+        }
+        else if(status.equals("denied")){
+            amount = reimbursementService.getTotalDeniedAmountByUserId(userId);
+        }
+
+        // Format the amount to 2 decimal places
+        amount = Math.round(amount * 100.0) / 100.0;
+
+        return ResponseEntity.ok(amount);
+    }
+
+    @GetMapping("/average_amount/{userId}")
+    @Secured("Manager")
+    public ResponseEntity<Double> getTotalReimbursementsAmountByUserId(@PathVariable int userId) {
+        double amount = 0;
+
+        amount = reimbursementService.getAverageAmountByUserId(userId);
+
+        return ResponseEntity.ok(amount);
+    }
+
+
+
+
+
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<Object> handleCustomException( CustomException e){
         return ResponseEntity.status(e.getStatus()).body(e.getMsg());

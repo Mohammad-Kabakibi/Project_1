@@ -33,4 +33,13 @@ public interface ReimbursementDAO extends JpaRepository<Reimbursement,Integer> {
     @Query("select sum(amount) from Reimbursement where status = :status")
     double findSumAmountByStatus(String status);
 
+    @Query("SELECT SUM(t.amount) FROM Reimbursement t WHERE t.user.userId = :userId")
+    Double findTotalAmountByUserId(int userId);
+
+    @Query("SELECT SUM(t.amount) FROM Reimbursement t WHERE t.status = :status AND t.user.userId = :userId")
+    Double findTotalAmountByUserIdAndStatus(int userId, String status);
+
+    @Query("SELECT AVG(t.amount) FROM Reimbursement t WHERE t.user.userId = :userId")
+    Double findAverageAmountByUserId(int userId);
+
 }
