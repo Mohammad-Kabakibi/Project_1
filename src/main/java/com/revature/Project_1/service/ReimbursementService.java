@@ -65,7 +65,7 @@ public class ReimbursementService {
 
 
     public List<Reimbursement> getAllReimbursements() {
-        return reimbursementDAO.findAll(Sort.by(Sort.Direction.DESC,"createdAt"));
+        return reimbursementDAO.findAll(Sort.by(Sort.Direction.DESC,"reimbId"));
 //        return reimbursementDAO.findAll();
     }
 
