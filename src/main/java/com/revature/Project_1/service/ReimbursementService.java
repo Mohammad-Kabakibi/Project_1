@@ -56,7 +56,7 @@ public class ReimbursementService {
     }
 
     public List<Reimbursement> getLoggedInUserReimbursements(int userId) {
-        return reimbursementDAO.findByUser_userId(userId);
+        return reimbursementDAO.findByUser_userId(userId, Sort.by(Sort.Direction.DESC, "ReimbId"));
     }
 
     public List<Reimbursement> getLoggedInUserPendingReimbursements(int userId) {
@@ -65,8 +65,8 @@ public class ReimbursementService {
 
 
     public List<Reimbursement> getAllReimbursements() {
-//        return reimbursementDAO.findAll(Sort.by("createdAt"));
-        return reimbursementDAO.findAll();
+        return reimbursementDAO.findAll(Sort.by(Sort.Direction.DESC,"createdAt"));
+//        return reimbursementDAO.findAll();
     }
 
     public List<Reimbursement> getPendingReimbursements() {
@@ -86,7 +86,7 @@ public class ReimbursementService {
             throw new InvalidIDException();
         if(userDAO.findById(userId).isEmpty())
             throw new UserNotFoundException(userId);
-        return reimbursementDAO.findByUser_userId(userId);
+        return reimbursementDAO.findByUser_userId(userId, Sort.by(Sort.Direction.DESC, "ReimbId"));
     }
 
     //Update reimbursement description

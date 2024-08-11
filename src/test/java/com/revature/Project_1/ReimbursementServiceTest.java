@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 
 import java.time.Instant;
 import java.util.*;
@@ -57,12 +58,12 @@ public class ReimbursementServiceTest {
                 new Reimbursement(2, "some description", 1000, "pending", null, null, Date.from(Instant.now()), null),
                 new Reimbursement(3, "some description", 1000, "pending", null, null, Date.from(Instant.now()), null));
 
-        when(reimbursementDAO.findAll()).thenReturn(reimbursements);
+        when(reimbursementDAO.findAll(any(Sort.class))).thenReturn(reimbursements);
 
         List<Reimbursement> returnedReimbursements = reimbursementService.getAllReimbursements();
 
         assertEquals(returnedReimbursements, reimbursements);
-        verify(reimbursementDAO, times(1)).findAll();
+        verify(reimbursementDAO, times(1)).findAll(any(Sort.class));
 
     }
 
@@ -78,12 +79,12 @@ public class ReimbursementServiceTest {
         List<Reimbursement> user1_reimbursements = Arrays.asList(new Reimbursement(1, "some description", 1000, "pending", user1, null, Date.from(Instant.now()), null),
                 new Reimbursement(2, "some description", 1000, "pending", user1, null, Date.from(Instant.now()), null));
 
-        when(reimbursementDAO.findByUser_userId(1)).thenReturn(user1_reimbursements);
+        when(reimbursementDAO.findByUser_userId(anyInt(), any(Sort.class))).thenReturn(user1_reimbursements);
 
         List<Reimbursement> returnedReimbursements = reimbursementService.getLoggedInUserReimbursements(1);
 
         assertEquals(returnedReimbursements, user1_reimbursements);
-        verify(reimbursementDAO, times(1)).findByUser_userId(1);
+        verify(reimbursementDAO, times(1)).findByUser_userId(anyInt(), any(Sort.class));
     }
 
     @Test
@@ -105,7 +106,7 @@ public class ReimbursementServiceTest {
                 new Reimbursement());
         User user = new User(1, "fname", "lname", "uname", "12345",null);
 
-        when(reimbursementDAO.findByUser_userId(1)).thenReturn(reimbursements);
+        when(reimbursementDAO.findByUser_userId(1, Sort.by(Sort.Direction.DESC,"ReimbId"))).thenReturn(reimbursements);
         when(userDAO.findById(1)).thenReturn(Optional.of(user)); // user exists
         when(userDAO.findById(2)).thenReturn(Optional.empty()); // user doesn't exist
 
@@ -114,9 +115,9 @@ public class ReimbursementServiceTest {
         assertEquals(returnedReimbursements, reimbursements);
         assertThrows(InvalidIDException.class, () -> reimbursementService.getReimbursementsByUserId(-1));
         assertThrows(UserNotFoundException.class, () -> reimbursementService.getReimbursementsByUserId(2));
-        verify(reimbursementDAO, times(1)).findByUser_userId(1);
-        verify(reimbursementDAO, times(0)).findByUser_userId(-1);
-        verify(reimbursementDAO, times(0)).findByUser_userId(2);
+        verify(reimbursementDAO, times(1)).findByUser_userId(1, Sort.by(Sort.Direction.DESC,"ReimbId"));
+        verify(reimbursementDAO, times(0)).findByUser_userId(-1, Sort.by(Sort.Direction.DESC,"ReimbId"));
+        verify(reimbursementDAO, times(0)).findByUser_userId(2, Sort.by(Sort.Direction.DESC,"ReimbId"));
     }
 
     @Test
