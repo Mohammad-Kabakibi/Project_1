@@ -146,7 +146,7 @@ public class ReimbursementServiceTest {
         User user = new User(1, "fname", "lname", "uname", "12345",null);
         User other_user = new User(12, "fname", "lname", "uname", "12345",null);
         Reimbursement reimbursement = new Reimbursement(1, "some description", 1000, "pending", user, null, Date.from(Instant.now()), null);
-        Reimbursement other_user_reimbursement = new Reimbursement(1, "some description", 1000, "pending", other_user, null, Date.from(Instant.now()), null);
+        Reimbursement other_user_reimbursement = new Reimbursement(7, "some description", 1000, "pending", other_user, null, Date.from(Instant.now()), null);
         Reimbursement non_pending_reimbursement = new Reimbursement(77, "some description", 1000, "approved", user, null, Date.from(Instant.now()), null);
 
         when(reimbursementDAO.findById(1)).thenReturn(Optional.of(reimbursement));
@@ -165,7 +165,7 @@ public class ReimbursementServiceTest {
         assertThrows(ForbiddenActionException.class, () -> reimbursementService.updateReimbursementDescription(7,"new description",1));
         assertThrows(ForbiddenActionException.class, () -> reimbursementService.updateReimbursementDescription(77,"new description",1));
         assertThrows(InvalidReimbursementException.class, () -> reimbursementService.updateReimbursementDescription(1,"",1));
-//        assertThrows(ForbiddenActionException.class, () -> reimbursementService.updateReimbursementById(1,map,false,"uname")); // if an employee tried to update the status
+
         verify(reimbursementDAO, times(2)).findById(1);
         verify(reimbursementDAO, times(1)).findById(7);
         verify(reimbursementDAO, times(1)).findById(77);
