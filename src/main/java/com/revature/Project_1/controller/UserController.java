@@ -33,7 +33,6 @@ public class UserController {
         this.reimbursementService = reimbursementService;
     }
 
-
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody @Valid User newUser) throws CustomException{
 
