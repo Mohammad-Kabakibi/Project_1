@@ -154,7 +154,6 @@ public class ReimbursementServiceTest {
         when(reimbursementDAO.findById(77)).thenReturn(Optional.of(non_pending_reimbursement));
         when(reimbursementDAO.findById(2)).thenReturn(Optional.empty()); // Reimbursement doesn't exist
         when(reimbursementDAO.save(any(Reimbursement.class))).thenReturn(reimbursement);
-//        when(userDAO.findById(1)).thenReturn(Optional.of(user));
 
 //        HashMap<String, String> map = new HashMap<>();
         Reimbursement returnedReimbursement = reimbursementService.updateReimbursementDescription(1,"new description",1);
